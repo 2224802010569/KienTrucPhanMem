@@ -22,7 +22,7 @@
         android:theme="@style/Theme.FinTrack">
 
         <activity
-            android:name=".UserService.view.SplashActivity"
+            android:name=".AccountService.view.WalletDetailActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,13 +61,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".AccountService.view.AccountDashboardActivity"
-            android:exported="false" />
-        <activity
             android:name=".AccountService.view.ManageWalletActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AccountService.view.WalletDetailActivity"
             android:exported="false" />
         <activity
             android:name=".AccountService.view.ActiveWalletsActivity"
