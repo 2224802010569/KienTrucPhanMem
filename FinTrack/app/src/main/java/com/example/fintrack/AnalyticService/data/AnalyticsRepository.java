@@ -17,7 +17,7 @@ public class AnalyticsRepository {
         this.db = db;
     }
 
-    public List<AnalyticsData> getAnalyticsData(){
+    public List<AnalyticsData> getAnalyticsData(String userId){
 
         List<AnalyticsData> list = new ArrayList<>();
 
@@ -26,8 +26,9 @@ public class AnalyticsRepository {
                         "FROM transactions t " +
                         "JOIN categories c ON t.category_id = c.category_id " +
                         "WHERE t.tx_type_id='EXPENSE' " +
-                        "AND t.user_id='u001' " +
-                        "GROUP BY c.name"
+                        "AND t.user_id=? " +
+                        "GROUP BY c.name",
+                new Object[]{userId}
         );
 
         double total = 0;

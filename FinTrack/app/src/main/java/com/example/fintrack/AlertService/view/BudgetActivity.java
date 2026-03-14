@@ -20,9 +20,10 @@ import com.example.fintrack.TransactionService.data.entity.CategoryEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 public class BudgetActivity extends AppCompatActivity {
-
+    private String currentUserId;
     private Spinner spCategory, spPeriod;
     private EditText etAmount;
     private CheckBox cbNotify;
@@ -57,6 +58,12 @@ public class BudgetActivity extends AppCompatActivity {
                 );
             }
         }
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        this.currentUserId = currentUser.user_id;
 
         initViews();
         initSpinners();
@@ -95,7 +102,9 @@ public class BudgetActivity extends AppCompatActivity {
             FintrackDatabase db =
                     FintrackDatabase.getInstance(getApplicationContext());
 
-            categoryList = db.categoryDao().getAll("u001");
+            categoryList =
+                    db.categoryDao().getParentByType(currentUserId, "EXPENSE");
+
 
             List<String> names = new ArrayList<>();
 
@@ -197,7 +206,7 @@ public class BudgetActivity extends AppCompatActivity {
 
                 Double spent =
                         db.transactionDao().getTotalExpenseByCategory(
-                                "u001",
+                                currentUserId,
                                 alert.categoryId,
                                 getCurrentMonth()
                         );

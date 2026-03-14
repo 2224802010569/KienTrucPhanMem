@@ -23,7 +23,7 @@ import android.widget.ImageButton;
 public class TransferActivity extends AppCompatActivity {
     private ImageButton btnBackTransfer;
     private final DecimalFormat df = new DecimalFormat("#,###");
-
+    private String currentUserId;
     private TextView tvSourceAccount, tvSourceBalance;
     private TextView tvTargetAccount, tvTargetBalance;
 
@@ -50,9 +50,21 @@ public class TransferActivity extends AppCompatActivity {
 
         initViews();
         btnBackTransfer.setOnClickListener(v -> finish());
+
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        currentUserId = currentUser.user_id;
+
         loadAccounts();
         setupPresetButtons();
         setupTransfer();
+
+        if (currentUser != null) {
+            currentUserId = currentUser.user_id;
+        }
     }
 
     @Override
@@ -82,7 +94,6 @@ public class TransferActivity extends AppCompatActivity {
             UserEntity currentUser = userRepo.getCurrentUser();
             if (currentUser == null) return;
 
-            // Lấy danh sách ví của User hiện tại thay vì dùng ID cứng "u001"
             List<AccountEntity> result = accountApi.getAccountsByUser(currentUser.user_id);
 
             runOnUiThread(() -> {
@@ -191,7 +202,8 @@ public class TransferActivity extends AppCompatActivity {
                 TransferMoneyUseCase useCase = new TransferMoneyUseCase(db.transactionDao(), accountApi);
 
                 useCase.execute(
-                        currentUser.user_id, // Sử dụng ID của user hiện tại
+
+                        currentUser.user_id,
                         selectedSourceId,
                         selectedTargetId,
                         amount,

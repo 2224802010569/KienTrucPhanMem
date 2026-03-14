@@ -24,6 +24,7 @@ import com.example.fintrack.AlertService.entity.Reminder;
 import com.example.fintrack.NotificationService.data.NotificationDao;
 import com.example.fintrack.NotificationService.data.entity.AppNotification;
 
+
 @Database(
         entities = {
                 TransactionEntity.class,
@@ -53,7 +54,6 @@ public abstract class FintrackDatabase extends RoomDatabase {
     public static FintrackDatabase getInstance(Context context) {
 
         if (INSTANCE == null) {
-
             synchronized (FintrackDatabase.class) {
 
                 if (INSTANCE == null) {
@@ -69,26 +69,34 @@ public abstract class FintrackDatabase extends RoomDatabase {
 
                                 @Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
-
                                     super.onCreate(db);
 
-                                    // ===== DEMO DATA =====
-
+                                    // ACCOUNT TYPES
                                     db.execSQL(
-                                            "INSERT INTO accounts (account_id,user_id,name,type_id,balance,status,created_at) VALUES " +
-                                                    "('acc001','u001','Ví chính','WALLET',10000000,'ACTIVE','2026')"
+                                            "INSERT INTO account_types (type_id,name,description) VALUES " +
+                                                    "('WALLET','Ví tiền','Tiền mặt')," +
+                                                    "('BANK','Ngân hàng','Tài khoản ngân hàng')"
                                     );
 
+                                    // TRANSACTION TYPES
                                     db.execSQL(
-                                            "INSERT INTO accounts (account_id,user_id,name,type_id,balance,status,created_at) VALUES " +
-                                                    "('acc002','u001','Ngân hàng','WALLET',50000000,'ACTIVE','2026')"
+                                            "INSERT INTO tx_types (tx_type_id,name,sign) VALUES " +
+                                                    "('INCOME','Thu nhập',1)," +
+                                                    "('EXPENSE','Chi tiêu',-1)," +
+                                                    "('TRANSFER','Chuyển khoản',0)"
                                     );
 
+                                    // KHÔNG seed user data
+                                    // users
+                                    // accounts
+                                    // transactions
+                                    // categories
                                 }
-
                             })
                             .build();
+
                 }
+
             }
         }
 
