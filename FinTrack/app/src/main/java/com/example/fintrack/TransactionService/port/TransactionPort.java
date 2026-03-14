@@ -32,4 +32,7 @@ public interface TransactionPort {
     Double getTotalIncome(String userId, String month);
 
     Double getTotalExpenseByCategory(String userId, String categoryId, String month);
+    void insertTransaction(TransactionEntity tx);
+
+    void deleteTransaction(String txId);
 }

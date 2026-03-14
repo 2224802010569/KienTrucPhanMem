@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import com.example.fintrack.TransactionService.view.TransferActivity;
-
+import com.example.fintrack.TransactionService.view.ScanReceiptActivity;
 public class AccountDashboardActivity extends AppCompatActivity {
     private TextView tvTotalBalance, tvAccountCount;
     private RecyclerView rvWallets;
@@ -69,6 +69,18 @@ public class AccountDashboardActivity extends AppCompatActivity {
         ImageButton btnTransfer = findViewById(R.id.btnTransfer);
         btnTransfer.setOnClickListener(v -> {
             startActivity(new Intent(this, TransferActivity.class));
+        });
+        ImageButton btnScanQR = findViewById(R.id.btnScanQR);
+
+        btnScanQR.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    AccountDashboardActivity.this,
+                    ScanReceiptActivity.class
+            );
+
+            startActivity(intent);
+
         });
     }
 

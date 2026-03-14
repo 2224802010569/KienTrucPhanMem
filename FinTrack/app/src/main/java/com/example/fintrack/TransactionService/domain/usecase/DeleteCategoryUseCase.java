@@ -13,11 +13,10 @@ public class DeleteCategoryUseCase {
         this.categoryDao = categoryDao;
     }
 
-    public void execute(CategoryEntity category) {
+    public void execute(String userId, CategoryEntity category) {
 
-        // 1. Lấy danh mục con
         List<CategoryEntity> children =
-                categoryDao.getChildren(category.category_id);
+                categoryDao.getChildren(userId, category.category_id);
 
         // 2. Không cho xoá nếu còn danh mục con
         if (children != null && !children.isEmpty()) {

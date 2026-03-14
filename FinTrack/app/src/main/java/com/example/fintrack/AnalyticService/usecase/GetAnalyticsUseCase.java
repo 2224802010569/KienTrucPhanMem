@@ -15,8 +15,8 @@ public class GetAnalyticsUseCase {
         service = new AnalyticsDomainService(repository);
     }
 
-    public List<AnalyticsData> execute(){
-        return service.getAnalytics();
+    public List<AnalyticsData> execute(String userId){
+        return service.getAnalytics(userId);
     }
 
     public String getInsight(List<AnalyticsData> list){

@@ -17,10 +17,12 @@ import com.example.fintrack.AccountService.model.AccountEntity;
 import java.text.DecimalFormat;
 import java.util.List;
 import android.widget.ImageButton;
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 public class TransferActivity extends AppCompatActivity {
     private ImageButton btnBackTransfer;
     private final DecimalFormat df = new DecimalFormat("#,###");
-
+    private String currentUserId;
     private TextView tvSourceAccount, tvSourceBalance;
     private TextView tvTargetAccount, tvTargetBalance;
 
@@ -45,9 +47,21 @@ public class TransferActivity extends AppCompatActivity {
 
         initViews();
         btnBackTransfer.setOnClickListener(v -> finish());
+
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        currentUserId = currentUser.user_id;
+
         loadAccounts();
         setupPresetButtons();
         setupTransfer();
+
+        if (currentUser != null) {
+            currentUserId = currentUser.user_id;
+        }
     }
 
     @Override
@@ -82,7 +96,7 @@ public class TransferActivity extends AppCompatActivity {
         new Thread(() -> {
 
             List<AccountEntity> result =
-                    accountApi.getAccountsByUser("u001");
+                    accountApi.getAccountsByUser(currentUserId);
 
             runOnUiThread(() -> {
 
@@ -222,7 +236,7 @@ public class TransferActivity extends AppCompatActivity {
                         );
 
                 useCase.execute(
-                        "u001",
+                        currentUserId,
                         selectedSourceId,
                         selectedTargetId,
                         amount,

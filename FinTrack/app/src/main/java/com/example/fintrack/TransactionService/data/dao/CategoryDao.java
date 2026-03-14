@@ -31,9 +31,10 @@ public interface CategoryDao {
 
     @Query(
             "SELECT * FROM categories " +
-                    "WHERE parent_category_id = :parentId"
+                    "WHERE (user_id IS NULL OR user_id = :userId) " +
+                    "AND parent_category_id = :parentId"
     )
-    List<CategoryEntity> getChildren(String parentId);
+    List<CategoryEntity> getChildren(String userId, String parentId);
 
     @Query(
             "SELECT * FROM categories " +
@@ -48,9 +49,10 @@ public interface CategoryDao {
 
     @Query(
             "SELECT * FROM categories " +
-                    "WHERE parent_category_id IS NULL " +
+                    "WHERE (user_id IS NULL OR user_id = :userId) " +
+                    "AND parent_category_id IS NULL " +
                     "AND tx_type_id = :type"
     )
-    List<CategoryEntity> getParentByType(String type);
+    List<CategoryEntity> getParentByType(String userId, String type);
 
 }

@@ -24,18 +24,19 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import com.example.fintrack.AccountService.model.AccountEntity;
-
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 public class AddTransactionActivity extends AppCompatActivity {
 
     private final DecimalFormat df = new DecimalFormat("#,###");
-
+    private String currentUserId;
     private EditText edtAmount, edtNote;
     private Button btnIncome, btnExpense, btnSave;
     private TextView txtCategoryName, txtCategoryIcon;
     private TextView txtAccountName, txtBalance;
     private TextView txtDateTime;
 
-    private String currentTxType = "EXPENSE";
+    private String currentTxType = "INCOME";
     private String selectedCategoryId = null;
     private String selectedAccountId = null;
 
@@ -55,12 +56,25 @@ public class AddTransactionActivity extends AppCompatActivity {
         accountApi = new AccountApiImpl(getApplicationContext());
 
         initViews();
+        switchToggle(false);
+        TextView btnCancel = findViewById(R.id.btnCancel);
+        TextView btnConfirm = findViewById(R.id.btnConfirm);
 
+        btnCancel.setOnClickListener(v -> finish());
+
+        btnConfirm.setOnClickListener(v -> addTransaction());
         selectedDate = LocalDate.now();
         selectedTime = LocalTime.now();
         updateDateTimeText();
 
         Button btnScanReceipt;
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        currentUserId = currentUser.user_id;
+
         receiveScanData();
 
         loadAccounts();
@@ -70,7 +84,6 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         setupToggleButtons();
         setupCategoryPicker();
-
         btnSave.setOnClickListener(v -> addTransaction());
 
         btnScanReceipt = findViewById(R.id.btnScanReceipt);
@@ -107,7 +120,7 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         new Thread(() -> {
 
-            accounts = accountApi.getAccountsByUser("u001");
+            accounts = accountApi.getAccountsByUser(currentUserId);
 
             runOnUiThread(() -> {
 
@@ -162,6 +175,8 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void switchToggle(boolean expense) {
+
+        currentTxType = expense ? "EXPENSE" : "INCOME";
 
         if (expense) {
 
@@ -289,7 +304,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                         db.alertDao(),
                         accountApi
                 ).execute(
-                        "u001",
+                        currentUserId,
                         currentTxType,
                         selectedAccountId,
                         selectedCategoryId,

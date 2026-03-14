@@ -24,9 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.time.format.DateTimeFormatter;
-
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 public class HistoryActivity extends AppCompatActivity {
-
+    private String currentUserId;
     private TransactionAdapter adapter;
     private Button btnSearch;
 
@@ -66,7 +67,13 @@ public class HistoryActivity extends AppCompatActivity {
         RecyclerView rv = findViewById(R.id.rvTransactions);
         FloatingActionButton fabAdd = findViewById(R.id.fabAdd);
         ImageButton btnFilter = findViewById(R.id.btnCategoryManager);
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
 
+
+        if (currentUser == null) return;
+
+        currentUserId = currentUser.user_id;
         btnFilter.setOnClickListener(v -> {
 
             Intent intent = new Intent(
@@ -173,7 +180,7 @@ public class HistoryActivity extends AppCompatActivity {
                         new SearchTransactionUseCase(db.transactionDao());
 
                 List<TransactionEntity> result = useCase.execute(
-                        "u001",
+                        currentUserId,
                         null,
                         accountFinal,
                         keywordFinal.isEmpty() ? null : keywordFinal,
@@ -243,7 +250,7 @@ public class HistoryActivity extends AppCompatActivity {
                     FintrackDatabase.getInstance(getApplicationContext());
 
             List<CategoryEntity> categories =
-                    db.categoryDao().getAll("u001");
+                    db.categoryDao().getAll(currentUserId);
 
             List<CategoryOption> options = new ArrayList<>();
             options.add(new CategoryOption(null, "ALL"));

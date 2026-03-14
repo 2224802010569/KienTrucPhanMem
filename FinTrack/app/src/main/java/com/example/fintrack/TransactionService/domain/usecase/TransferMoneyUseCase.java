@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+import androidx.room.Transaction;
+
 public class TransferMoneyUseCase {
 
     private final TransactionDao transactionDao;
@@ -21,6 +23,7 @@ public class TransferMoneyUseCase {
         this.accountPort = accountPort;
     }
 
+    @Transaction
     public void execute(
             String userId,
             String sourceAccountId,
@@ -40,16 +43,17 @@ public class TransferMoneyUseCase {
         if (amount <= 0) {
             throw new IllegalArgumentException("Amount must be > 0");
         }
+
         double sourceBalance = accountPort.getBalance(sourceAccountId);
 
         if (sourceBalance < amount) {
             throw new IllegalArgumentException("Không đủ số dư");
         }
-        // cập nhật số dư thông qua AccountService
+
+        // cập nhật ví
         accountPort.updateBalance(sourceAccountId, -amount);
         accountPort.updateBalance(targetAccountId, amount);
 
-        // tạo transaction
         TransactionEntity tx = new TransactionEntity();
         tx.tx_id = UUID.randomUUID().toString();
         tx.user_id = userId;

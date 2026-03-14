@@ -23,9 +23,11 @@ import com.github.mikephil.charting.data.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 
 public class AnalyticsActivity extends AppCompatActivity {
-
+    private String currentUserId;
     PieChart pieChart;
     BarChart barChart;
     RecyclerView recyclerView;
@@ -54,6 +56,13 @@ public class AnalyticsActivity extends AppCompatActivity {
                         .getOpenHelper()
                         .getWritableDatabase()
         );
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        currentUserId = currentUser.user_id;
+
 
         service = new AnalyticsDomainService(repo);
 
@@ -75,7 +84,7 @@ public class AnalyticsActivity extends AppCompatActivity {
 
         new Thread(() -> {
 
-            List<AnalyticsData> list = service.getAnalytics();
+            List<AnalyticsData> list = service.getAnalytics(currentUserId);
 
             runOnUiThread(() -> {
 
@@ -182,7 +191,7 @@ public class AnalyticsActivity extends AppCompatActivity {
                     FintrackDatabase.getInstance(getApplicationContext());
 
             List<TransactionEntity> list =
-                    db.transactionDao().getAll();
+                    db.transactionDao().getAllByUser(currentUserId);
 
             double income = 0;
             double expense = 0;
