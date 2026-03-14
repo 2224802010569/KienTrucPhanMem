@@ -31,6 +31,9 @@ public class BudgetActivity extends AppCompatActivity {
 
     private TextView tvTotalSpent;
 
+    // ⭐ NÚT BACK
+    private ImageButton btnBack;
+
     private List<CategoryEntity> categoryList = new ArrayList<>();
 
     RecyclerView rvBudgets;
@@ -64,6 +67,8 @@ public class BudgetActivity extends AppCompatActivity {
 
     private void initViews() {
 
+        btnBack = findViewById(R.id.btnBack);
+
         spCategory = findViewById(R.id.spCategory);
         spPeriod = findViewById(R.id.spPeriod);
         etAmount = findViewById(R.id.etAmount);
@@ -76,6 +81,11 @@ public class BudgetActivity extends AppCompatActivity {
         rvBudgets.setLayoutManager(new LinearLayoutManager(this));
 
         tvTotalSpent = findViewById(R.id.tvTotalSpent);
+
+        // ⭐ SỰ KIỆN BACK
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void initSpinners() {

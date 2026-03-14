@@ -3,6 +3,7 @@ package com.example.fintrack.AlertService.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,6 +22,8 @@ public class ReminderActivity extends AppCompatActivity {
     Button btnAddReminder;
     RecyclerView recyclerView;
 
+    ImageButton btnBack;   // ⭐ nút quay lại
+
     ReminderRepository repo;
     ReminderAdapter adapter;
 
@@ -32,6 +35,9 @@ public class ReminderActivity extends AppCompatActivity {
         btnAddReminder = findViewById(R.id.btnAddReminder);
         recyclerView = findViewById(R.id.recyclerReminder);
 
+        // ⭐ tìm nút back
+        btnBack = findViewById(R.id.btnBack);
+
         repo = new ReminderRepository(
                 FintrackDatabase
                         .getInstance(this)
@@ -42,6 +48,11 @@ public class ReminderActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         loadReminders();
+
+        // ⭐ sự kiện nút quay lại
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
 
         btnAddReminder.setOnClickListener(v -> {
 

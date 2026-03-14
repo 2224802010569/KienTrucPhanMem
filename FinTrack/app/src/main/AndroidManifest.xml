@@ -8,27 +8,33 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false"/>
-<!--    android:allowBackup="true"-->
-<!--    android:fullBackupContent="@xml/backup_rules"-->
+
     <application
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
-
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinTrack">
 
+        <!-- MAIN SCREEN -->
         <activity
-            android:name=".UserService.view.SplashActivity"
+            android:name=".AccountService.view.AccountDashboardActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
+        <!-- SPLASH (không còn là launcher) -->
+        <activity
+            android:name=".UserService.view.SplashActivity"
+            android:exported="false"/>
 
         <activity
             android:name=".UserService.view.PersonalInfoActivity"
@@ -60,9 +66,6 @@
             android:name=".MainActivity"
             android:exported="false" />
 
-        <activity
-            android:name=".AccountService.view.AccountDashboardActivity"
-            android:exported="false" />
         <activity
             android:name=".AccountService.view.ManageWalletActivity"
             android:exported="false" />
@@ -115,16 +118,21 @@
         <activity
             android:name=".NotificationService.view.ResetActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:scheme="https"
                     android:host="fintrackapp"
                     android:path="/resetpassword" />
             </intent-filter>
+
         </activity>
 
     </application>
+
 </manifest>

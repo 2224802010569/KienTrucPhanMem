@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,6 +34,9 @@ public class AnalyticsActivity extends AppCompatActivity {
     TextView txtInsight, txtBalance;
     Button btnLimit;
 
+    // ⭐ NÚT BACK
+    ImageButton btnBack;
+
     AnalyticsRepository repo;
     AnalyticsDomainService service;
 
@@ -47,6 +51,14 @@ public class AnalyticsActivity extends AppCompatActivity {
         txtInsight = findViewById(R.id.txtInsight);
         txtBalance = findViewById(R.id.txtBalance);
         btnLimit = findViewById(R.id.btnLimit);
+
+        // ⭐ ÁNH XẠ NÚT BACK
+        btnBack = findViewById(R.id.btnBack);
+
+        // ⭐ SỰ KIỆN BACK
+        btnBack.setOnClickListener(v -> {
+            finish(); // quay lại BudgetActivity
+        });
 
         repo = new AnalyticsRepository(
                 FintrackDatabase
@@ -128,12 +140,10 @@ public class AnalyticsActivity extends AppCompatActivity {
 
         pieChart.setData(data);
 
-        // UI CHART
         pieChart.setDrawHoleEnabled(true);
         pieChart.setHoleRadius(70f);
         pieChart.setTransparentCircleRadius(75f);
 
-        // TEXT Ở GIỮA
         pieChart.setCenterText(
                 "TOTAL SPENT\n" +
                         NumberFormat.getInstance().format(total)
