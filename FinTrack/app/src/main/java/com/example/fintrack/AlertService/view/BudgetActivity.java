@@ -63,7 +63,8 @@ public class BudgetActivity extends AppCompatActivity {
 
         if (currentUser == null) return;
 
-        String currentUserId = currentUser.user_id;
+        this.currentUserId = currentUser.user_id;
+
         initViews();
         initSpinners();
         setupCreateButton();
@@ -101,7 +102,9 @@ public class BudgetActivity extends AppCompatActivity {
             FintrackDatabase db =
                     FintrackDatabase.getInstance(getApplicationContext());
 
-            categoryList = db.categoryDao().getAll(currentUserId);
+            categoryList =
+                    db.categoryDao().getParentByType(currentUserId, "EXPENSE");
+
 
             List<String> names = new ArrayList<>();
 
