@@ -2,6 +2,7 @@ package com.example.fintrack.AccountService.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fintrack.AccountService.data.AccountRepository;
 import com.example.fintrack.AccountService.model.AccountEntity;
+import com.example.fintrack.NotificationService.view.NotificationHistoryActivity;
 import com.example.fintrack.UserService.view.UserAccountProfileActivity;
 import com.example.fintrack.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -56,6 +58,8 @@ public class AccountDashboardActivity extends AppCompatActivity {
         ImageButton btnBills = findViewById(R.id.btnBills);
         ImageButton btnReports = findViewById(R.id.btnReports);
 
+        FrameLayout btnNotification = findViewById(R.id.btnNotification);
+
         adapter = new AccountAdapter(accountList);
         rvWallets.setLayoutManager(new LinearLayoutManager(this));
         rvWallets.setNestedScrollingEnabled(false);
@@ -81,6 +85,10 @@ public class AccountDashboardActivity extends AppCompatActivity {
         // ANALYSIS
         btnNavAnalysis.setOnClickListener(v ->
                 startActivity(new Intent(this, AnalyticsActivity.class)));
+
+        // NOTIFICATION
+        btnNotification.setOnClickListener(v ->
+                startActivity(new Intent(this, NotificationHistoryActivity.class)));
 
         btnMenuMore.setOnClickListener(v -> {
 

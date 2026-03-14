@@ -18,6 +18,8 @@ import com.example.fintrack.R;
 import com.example.fintrack.TransactionService.data.db.FintrackDatabase;
 import com.example.fintrack.TransactionService.domain.usecase.AddTransactionUseCase;
 import com.example.fintrack.AccountService.api.AccountApiImpl;
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -45,6 +47,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private List<AccountEntity> accounts;
 
     private AccountApiImpl accountApi;
+    private UserRepository userRepo;
 
     @OptIn(markerClass = ExperimentalGetImage.class)
     @Override
@@ -53,6 +56,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_transaction_v2);
 
         accountApi = new AccountApiImpl(getApplicationContext());
+        userRepo = new UserRepository(this);
 
         initViews();
 
@@ -83,6 +87,8 @@ public class AddTransactionActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
+
+        findViewById(R.id.btnCancel).setOnClickListener(v -> finish());
     }
 
     private void initViews() {
@@ -106,8 +112,10 @@ public class AddTransactionActivity extends AppCompatActivity {
     private void loadAccounts() {
 
         new Thread(() -> {
+            UserEntity currentUser = userRepo.getCurrentUser();
+            if (currentUser == null) return;
 
-            accounts = accountApi.getAccountsByUser("u001");
+            accounts = accountApi.getAccountsByUser(currentUser.user_id);
 
             runOnUiThread(() -> {
 
@@ -119,12 +127,25 @@ public class AddTransactionActivity extends AppCompatActivity {
                     return;
                 }
 
-                AccountEntity acc = accounts.get(0);
+                // Nếu có ACCOUNT_ID truyền từ màn hình Detail Wallet
+                String preselectedId = getIntent().getStringExtra("ACCOUNT_ID");
+                AccountEntity selectedAcc = null;
 
-                selectedAccountId = acc.accountId;
+                if (preselectedId != null) {
+                    for (AccountEntity a : accounts) {
+                        if (a.accountId.equals(preselectedId)) {
+                            selectedAcc = a;
+                            break;
+                        }
+                    }
+                }
 
-                txtAccountName.setText(acc.name);
-                txtBalance.setText("Số dư: " + df.format(acc.balance) + " đ");
+                if (selectedAcc == null) selectedAcc = accounts.get(0);
+
+                selectedAccountId = selectedAcc.accountId;
+
+                txtAccountName.setText(selectedAcc.name);
+                txtBalance.setText("Số dư: " + df.format(selectedAcc.balance) + " đ");
 
                 findViewById(R.id.layoutAccount)
                         .setOnClickListener(v ->
@@ -159,6 +180,13 @@ public class AddTransactionActivity extends AppCompatActivity {
             currentTxType = "INCOME";
             switchToggle(false);
         });
+
+        // Nhận TX_TYPE mặc định nếu có (ví dụ từ nút Add Money ở ví)
+        String type = getIntent().getStringExtra("TX_TYPE");
+        if ("INCOME".equals(type)) {
+            currentTxType = "INCOME";
+            switchToggle(false);
+        }
     }
 
     private void switchToggle(boolean expense) {
@@ -279,6 +307,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         new Thread(() -> {
 
             try {
+                UserEntity currentUser = userRepo.getCurrentUser();
+                if (currentUser == null) return;
 
                 FintrackDatabase db =
                         FintrackDatabase.getInstance(getApplicationContext());
@@ -289,7 +319,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                         db.alertDao(),
                         accountApi
                 ).execute(
-                        "u001",
+                        currentUser.user_id,
                         currentTxType,
                         selectedAccountId,
                         selectedCategoryId,
@@ -304,7 +334,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                             "Đã thêm giao dịch",
                             Toast.LENGTH_SHORT).show();
 
-                    loadAccounts();
+                    finish(); // Quay lại màn hình trước đó sau khi lưu
                 });
 
             } catch (Exception e) {

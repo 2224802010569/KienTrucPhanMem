@@ -87,9 +87,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         Toast.makeText(this, "Đang gửi OTP đến Email...", Toast.LENGTH_SHORT).show();
 
-        // GỌI SANG NOTIFICATION SERVICE ĐỂ GỬI OTP VÀ MỞ MÀN HÌNH NHẬP OTP
         com.example.fintrack.NotificationService.api.NotificationApiImpl notifApi =
-                new com.example.fintrack.NotificationService.api.NotificationApiImpl();
+                new com.example.fintrack.NotificationService.api.NotificationApiImpl(this);
 
         notifApi.sendOtp(email);
         notifApi.openOtpView(this, email, username, password);

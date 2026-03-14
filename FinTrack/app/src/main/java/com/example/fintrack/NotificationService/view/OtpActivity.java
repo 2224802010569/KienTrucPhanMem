@@ -108,7 +108,7 @@ public class OtpActivity extends AppCompatActivity {
 
         if (wrongCount >= MAX_ATTEMPTS || inputOtp.length() < 8) return;
 
-        NotificationRepository repo = new NotificationRepository();
+        NotificationRepository repo = new NotificationRepository(this);
         boolean isOtpValid = repo.verifyOtp(inputOtp, email, username, password);
 
         if (isOtpValid) {

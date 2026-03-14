@@ -40,7 +40,7 @@
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="More options"
-            android:src="@android:drawable/ic_secure" />
+            android:src="@android:drawable/ic_menu_more" />
     </RelativeLayout>
 
     <ScrollView
@@ -60,7 +60,8 @@
                 android:layout_height="100dp"
                 android:layout_marginBottom="16dp"
                 android:contentDescription="Wallet Icon"
-                android:padding="20dp" />
+                android:padding="20dp"
+                android:src="@drawable/ic_menu_view" />
 
             <TextView
                 android:id="@+id/txtDetailWalletName"
@@ -185,11 +186,12 @@
                 android:textColor="#000000"
                 android:textStyle="bold" />
 
-            <include
-                layout="@layout/item_wallet"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRecentTransactions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false" />
 
         </LinearLayout>
     </ScrollView>

@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -19,22 +20,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FinTrack">
 
-        <!-- MAIN SCREEN -->
+
         <activity
             android:name=".AccountService.view.AccountDashboardActivity"
-            android:exported="true">
+            android:exported="false"/>
 
+        <activity
+            android:name=".UserService.view.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
-        <!-- SPLASH (không còn là launcher) -->
-        <activity
-            android:name=".UserService.view.SplashActivity"
-            android:exported="false"/>
 
         <activity
             android:name=".UserService.view.PersonalInfoActivity"
@@ -114,6 +112,11 @@
         <activity
             android:name=".NotificationService.view.OtpActivity"
             android:exported="false"/>
+
+        <activity
+            android:name=".NotificationService.view.NotificationHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
         <activity
             android:name=".NotificationService.view.ResetActivity"
