@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import android.net.Uri;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,13 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.fintrack.R;
 import com.example.fintrack.UserService.data.UserRepository;
 import com.example.fintrack.UserService.data.entity.UserEntity;
+import com.example.fintrack.AlertService.view.BudgetActivity;
 
 public class UserAccountProfileActivity extends AppCompatActivity {
 
     ImageView btnBack, btnSetting, imgAvatar;
     TextView txtName, txtEmail, txtStatus;
     Button btnLogout;
-
 
     LinearLayout itemPersonalInfo, itemSecurity, itemLanguage;
     LinearLayout itemNotification, itemDefaultCurrency, itemHelp;
@@ -42,7 +41,7 @@ public class UserAccountProfileActivity extends AppCompatActivity {
 
         btnLogout = findViewById(R.id.btnLogout);
 
-        imgAvatar = findViewById(R.id.imgAvatar); //
+        imgAvatar = findViewById(R.id.imgAvatar);
 
         itemPersonalInfo = findViewById(R.id.itemPersonalInfo);
         itemSecurity = findViewById(R.id.itemSecurity);
@@ -63,7 +62,11 @@ public class UserAccountProfileActivity extends AppCompatActivity {
 
         itemPersonalInfo.setOnClickListener(v -> {
 
-            Intent intent = new Intent(UserAccountProfileActivity.this, PersonalInfoActivity.class);
+            Intent intent = new Intent(
+                    UserAccountProfileActivity.this,
+                    PersonalInfoActivity.class
+            );
+
             startActivity(intent);
 
         });
@@ -76,9 +79,17 @@ public class UserAccountProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Language feature removed", Toast.LENGTH_SHORT).show()
         );
 
-        itemNotification.setOnClickListener(v ->
-                Toast.makeText(this, "Notifications", Toast.LENGTH_SHORT).show()
-        );
+        // ⭐ MỞ MÀN BUDGET KHI ẤN NOTIFICATIONS
+        itemNotification.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    UserAccountProfileActivity.this,
+                    BudgetActivity.class
+            );
+
+            startActivity(intent);
+
+        });
 
         itemDefaultCurrency.setOnClickListener(v ->
                 Toast.makeText(this, "Default Currency: VND", Toast.LENGTH_SHORT).show()
