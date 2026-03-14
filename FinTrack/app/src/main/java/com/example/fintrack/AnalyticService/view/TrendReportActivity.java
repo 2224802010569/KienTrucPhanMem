@@ -1,6 +1,7 @@
 package com.example.fintrack.AnalyticService.view;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,6 +25,8 @@ public class TrendReportActivity extends AppCompatActivity {
     TextView txtSaving;
     LinearLayout layoutBreakdown;
 
+    ImageButton btnBack;
+
     SimpleDateFormat dbFormat =
             new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
@@ -35,6 +38,12 @@ public class TrendReportActivity extends AppCompatActivity {
         chart = findViewById(R.id.chartIncome);
         txtSaving = findViewById(R.id.txtSaving);
         layoutBreakdown = findViewById(R.id.layoutBreakdown);
+
+        btnBack = findViewById(R.id.btnBack);
+
+        btnBack.setOnClickListener(v -> {
+            finish(); // quay lại AnalyticsActivity
+        });
 
         loadChart();
         loadBreakdown();

@@ -18,7 +18,14 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal">
-
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_media_previous"
+                android:background="@android:color/transparent"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"/>
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
