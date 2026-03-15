@@ -19,6 +19,7 @@ public class ReminderRepository {
         this.db = db;
     }
 
+    // SAVE REMINDER
     public void save(Reminder r) {
 
         db.execSQL(
@@ -34,6 +35,7 @@ public class ReminderRepository {
         );
     }
 
+    // GET ALL REMINDERS
     public List<Reminder> findAll() {
 
         List<Reminder> list = new ArrayList<>();
@@ -60,5 +62,14 @@ public class ReminderRepository {
         c.close();
 
         return list;
+    }
+
+    // ✅ FIX LỖI: DELETE REMINDER
+    public void delete(String id) {
+
+        db.execSQL(
+                "DELETE FROM reminders WHERE id = ?",
+                new Object[]{id}
+        );
     }
 }

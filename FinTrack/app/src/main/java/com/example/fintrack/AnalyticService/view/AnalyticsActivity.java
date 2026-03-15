@@ -24,11 +24,14 @@ import com.github.mikephil.charting.data.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.example.fintrack.UserService.data.UserRepository;
 import com.example.fintrack.UserService.data.entity.UserEntity;
 
 public class AnalyticsActivity extends AppCompatActivity {
+
     private String currentUserId;
+
     PieChart pieChart;
     BarChart barChart;
     RecyclerView recyclerView;
@@ -36,8 +39,12 @@ public class AnalyticsActivity extends AppCompatActivity {
     TextView txtInsight, txtBalance;
     Button btnLimit;
 
-    // ⭐ NÚT BACK
     ImageButton btnBack;
+
+    Button btnIncome, btnExpense, btnDay, btnMonth, btnYear;
+
+    String filterType = "EXPENSE";
+    String filterTime = "MONTH";
 
     AnalyticsRepository repo;
     AnalyticsDomainService service;
@@ -54,13 +61,15 @@ public class AnalyticsActivity extends AppCompatActivity {
         txtBalance = findViewById(R.id.txtBalance);
         btnLimit = findViewById(R.id.btnLimit);
 
-        // ⭐ ÁNH XẠ NÚT BACK
         btnBack = findViewById(R.id.btnBack);
 
-        // ⭐ SỰ KIỆN BACK
-        btnBack.setOnClickListener(v -> {
-            finish(); // quay lại BudgetActivity
-        });
+        btnIncome = findViewById(R.id.btnIncome);
+        btnExpense = findViewById(R.id.btnExpense);
+        btnDay = findViewById(R.id.btnDay);
+        btnMonth = findViewById(R.id.btnMonth);
+        btnYear = findViewById(R.id.btnYear);
+
+        btnBack.setOnClickListener(v -> finish());
 
         repo = new AnalyticsRepository(
                 FintrackDatabase
@@ -68,6 +77,7 @@ public class AnalyticsActivity extends AppCompatActivity {
                         .getOpenHelper()
                         .getWritableDatabase()
         );
+
         UserRepository userRepo = new UserRepository(this);
         UserEntity currentUser = userRepo.getCurrentUser();
 
@@ -75,8 +85,9 @@ public class AnalyticsActivity extends AppCompatActivity {
 
         currentUserId = currentUser.user_id;
 
-
         service = new AnalyticsDomainService(repo);
+
+        setupFilterButtons();
 
         loadAnalytics();
         calculateBalance();
@@ -92,11 +103,50 @@ public class AnalyticsActivity extends AppCompatActivity {
         });
     }
 
+    private void setupFilterButtons(){
+
+        btnIncome.setOnClickListener(v -> {
+
+            filterType = "INCOME";
+            loadAnalytics();
+
+        });
+
+        btnExpense.setOnClickListener(v -> {
+
+            filterType = "EXPENSE";
+            loadAnalytics();
+
+        });
+
+        btnDay.setOnClickListener(v -> {
+
+            filterTime = "DAY";
+            loadAnalytics();
+
+        });
+
+        btnMonth.setOnClickListener(v -> {
+
+            filterTime = "MONTH";
+            loadAnalytics();
+
+        });
+
+        btnYear.setOnClickListener(v -> {
+
+            filterTime = "YEAR";
+            loadAnalytics();
+
+        });
+    }
+
     private void loadAnalytics(){
 
         new Thread(() -> {
 
-            List<AnalyticsData> list = service.getAnalytics(currentUserId);
+            List<AnalyticsData> list =
+                    service.getAnalytics(currentUserId, filterType, filterTime);
 
             runOnUiThread(() -> {
 
@@ -127,23 +177,43 @@ public class AnalyticsActivity extends AppCompatActivity {
         double total = 0;
 
         for(AnalyticsData d : list){
-            entries.add(new PieEntry((float)d.getAmount(), d.getCategory()));
+
+            entries.add(
+                    new PieEntry(
+                            (float)d.getAmount(),
+                            d.getCategory()
+                    )
+            );
+
             total += d.getAmount();
         }
 
-        PieDataSet set = new PieDataSet(entries,"Expenses");
+        PieDataSet set = new PieDataSet(entries,"");
 
-        set.setColors(
-                Color.parseColor("#2ECC71"),
-                Color.parseColor("#F39C12"),
-                Color.parseColor("#3498DB"),
-                Color.parseColor("#9B59B6"),
-                Color.parseColor("#E74C3C")
-        );
+        if(filterType.equals("INCOME")){
+
+            set.setColors(
+                    Color.parseColor("#2ECC71"),
+                    Color.parseColor("#27AE60"),
+                    Color.parseColor("#1ABC9C"),
+                    Color.parseColor("#16A085")
+            );
+
+        }
+        else{
+
+            set.setColors(
+                    Color.parseColor("#E74C3C"),
+                    Color.parseColor("#C0392B"),
+                    Color.parseColor("#F39C12"),
+                    Color.parseColor("#D35400")
+            );
+
+        }
 
         set.setSliceSpace(3f);
         set.setValueTextColor(Color.WHITE);
-        set.setValueTextSize(12f);
+        set.setValueTextSize(13f);
 
         PieData data = new PieData(set);
 
@@ -153,8 +223,14 @@ public class AnalyticsActivity extends AppCompatActivity {
         pieChart.setHoleRadius(70f);
         pieChart.setTransparentCircleRadius(75f);
 
+        pieChart.setEntryLabelColor(Color.WHITE);
+        pieChart.setEntryLabelTextSize(12f);
+
+        String title =
+                filterType.equals("INCOME") ? "INCOME" : "EXPENSE";
+
         pieChart.setCenterText(
-                "TOTAL SPENT\n" +
+                title + "\n" +
                         NumberFormat.getInstance().format(total)
         );
 
@@ -162,7 +238,7 @@ public class AnalyticsActivity extends AppCompatActivity {
         pieChart.setCenterTextColor(Color.BLACK);
 
         pieChart.getDescription().setEnabled(false);
-        pieChart.getLegend().setEnabled(true);
+        pieChart.getLegend().setTextSize(12f);
 
         pieChart.animateY(1200);
 
@@ -176,17 +252,32 @@ public class AnalyticsActivity extends AppCompatActivity {
         int index = 0;
 
         for(AnalyticsData d : list){
-            entries.add(new BarEntry(index++, (float)d.getAmount()));
+
+            entries.add(
+                    new BarEntry(
+                            index++,
+                            (float)d.getAmount()
+                    )
+            );
         }
 
-        BarDataSet set = new BarDataSet(entries,"Expenses");
+        BarDataSet set = new BarDataSet(entries,"");
 
-        set.setColor(Color.parseColor("#1ABC9C"));
+        if(filterType.equals("INCOME")){
+            set.setColor(Color.parseColor("#2ECC71"));
+        }
+        else{
+            set.setColor(Color.parseColor("#E74C3C"));
+        }
+
+        set.setValueTextSize(12f);
 
         BarData data = new BarData(set);
 
         barChart.setData(data);
+
         barChart.getDescription().setEnabled(false);
+        barChart.getLegend().setEnabled(false);
 
         barChart.animateY(1000);
 

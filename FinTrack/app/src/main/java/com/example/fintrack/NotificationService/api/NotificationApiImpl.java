@@ -12,8 +12,8 @@ public class NotificationApiImpl implements NotificationPort {
 
     private final NotificationRepository repository;
 
-    public NotificationApiImpl() {
-        this.repository = new NotificationRepository();
+    public NotificationApiImpl(Context context) {
+        this.repository = new NotificationRepository(context);
     }
 
     @Override

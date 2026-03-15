@@ -21,14 +21,14 @@ public class NotificationHelper {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context, CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentTitle("FinTrack Alert")
-                        .setContentText(message)
+                        .setContentTitle("📅 FinTrack Reminder")
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(message))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setAutoCancel(true);
 
         NotificationManagerCompat.from(context)
-                .notify((int) System.currentTimeMillis(),
-                        builder.build());
+                .notify((int) System.currentTimeMillis(), builder.build());
     }
 
     private static void createChannel(Context context) {
@@ -38,7 +38,7 @@ public class NotificationHelper {
             NotificationChannel channel =
                     new NotificationChannel(
                             CHANNEL_ID,
-                            "Alert Channel",
+                            "FinTrack Alerts",
                             NotificationManager.IMPORTANCE_HIGH
                     );
 

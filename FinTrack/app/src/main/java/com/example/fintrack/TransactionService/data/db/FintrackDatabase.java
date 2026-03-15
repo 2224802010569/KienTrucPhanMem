@@ -20,6 +20,11 @@ import com.example.fintrack.AccountService.model.AccountTypeEntity;
 import com.example.fintrack.UserService.data.dao.UserDao;
 import com.example.fintrack.UserService.data.entity.UserEntity;
 
+import com.example.fintrack.AlertService.entity.Reminder;
+import com.example.fintrack.NotificationService.data.NotificationDao;
+import com.example.fintrack.NotificationService.data.entity.AppNotification;
+
+
 @Database(
         entities = {
                 TransactionEntity.class,
@@ -28,9 +33,11 @@ import com.example.fintrack.UserService.data.entity.UserEntity;
                 AlertEntity.class,
                 TxTypeEntity.class,
                 UserEntity.class,
-                AccountTypeEntity.class
+                AccountTypeEntity.class,
+                Reminder.class,
+                AppNotification.class
         },
-        version = 12,
+        version = 13,
         exportSchema = false
 )
 public abstract class FintrackDatabase extends RoomDatabase {
@@ -42,6 +49,7 @@ public abstract class FintrackDatabase extends RoomDatabase {
     public abstract CategoryDao categoryDao();
     public abstract AlertDao alertDao();
     public abstract UserDao userDao();
+    public abstract NotificationDao notificationDao();
 
     public static FintrackDatabase getInstance(Context context) {
 

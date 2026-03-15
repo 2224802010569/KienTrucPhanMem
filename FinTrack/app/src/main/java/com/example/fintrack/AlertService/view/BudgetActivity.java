@@ -47,7 +47,7 @@ public class BudgetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_budget);
 
-        // ⭐ xin quyền notification Android 13+
+
         if (Build.VERSION.SDK_INT >= 33) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
                     != getPackageManager().PERMISSION_GRANTED) {
@@ -168,8 +168,8 @@ public class BudgetActivity extends AppCompatActivity {
 
             if (cbNotify.isChecked()) {
 
-                new CheckBudgetWarningUseCase(repo)
-                        .execute(BudgetActivity.this);
+                new CheckBudgetWarningUseCase(BudgetActivity.this, repo)
+                        .execute();
             }
 
         });
@@ -233,8 +233,8 @@ public class BudgetActivity extends AppCompatActivity {
 
                 if (cbNotify.isChecked()) {
 
-                    new CheckBudgetWarningUseCase(repo)
-                            .execute(BudgetActivity.this);
+                    new CheckBudgetWarningUseCase(BudgetActivity.this, repo)
+                            .execute();
                 }
 
             });

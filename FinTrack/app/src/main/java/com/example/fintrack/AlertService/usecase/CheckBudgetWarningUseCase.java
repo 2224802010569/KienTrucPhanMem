@@ -4,19 +4,22 @@ import android.content.Context;
 
 import com.example.fintrack.AlertService.data.AlertRepository;
 import com.example.fintrack.AlertService.entity.BudgetAlert;
-import com.example.fintrack.NotificationService.service.NotificationHelper;
+import com.example.fintrack.NotificationService.data.NotificationRepository;
+import com.example.fintrack.NotificationService.data.entity.AppNotification;
 
 import java.util.List;
 
 public class CheckBudgetWarningUseCase {
 
     private final AlertRepository repo;
+    private final NotificationRepository notificationRepo;
 
-    public CheckBudgetWarningUseCase(AlertRepository repo) {
+    public CheckBudgetWarningUseCase(Context context, AlertRepository repo) {
         this.repo = repo;
+        this.notificationRepo = new NotificationRepository(context);
     }
 
-    public void execute(Context context) {
+    public void execute() {
 
         List<BudgetAlert> list = repo.findAll();
 
@@ -34,9 +37,10 @@ public class CheckBudgetWarningUseCase {
             // ⚠ đạt 80%
             if (percent >= a.threshold && !a.triggered) {
 
-                NotificationHelper.send(
-                        context,
-                        "⚠ " + a.categoryName + " reached 80% of budget"
+                notificationRepo.pushAndSave(
+                        "Budget Warning",
+                        "⚠ " + a.categoryName + " reached " + (int)(a.threshold * 100) + "% of budget",
+                        AppNotification.TYPE_ALERT
                 );
 
                 a.triggered = true;
@@ -44,10 +48,11 @@ public class CheckBudgetWarningUseCase {
 
             // 🚨 vượt ngân sách
             if (a.spent > a.limitAmount) {
-
-                NotificationHelper.send(
-                        context,
-                        "🚨 " + a.categoryName + " exceeded budget!"
+                
+                notificationRepo.pushAndSave(
+                        "Budget Exceeded",
+                        "🚨 " + a.categoryName + " exceeded budget!",
+                        AppNotification.TYPE_ALERT
                 );
             }
         }

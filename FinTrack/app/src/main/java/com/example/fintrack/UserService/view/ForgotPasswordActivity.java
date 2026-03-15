@@ -51,9 +51,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 return;
             }
 
-            // GỌI SANG NOTIFICATION SERVICE ĐỂ GỬI LINK RESET
             com.example.fintrack.NotificationService.api.NotificationApiImpl notifApi =
-                    new com.example.fintrack.NotificationService.api.NotificationApiImpl();
+                    new com.example.fintrack.NotificationService.api.NotificationApiImpl(this);
 
             notifApi.requestResetPassword(email);
             android.content.SharedPreferences prefs = getSharedPreferences("USER_SESSION", MODE_PRIVATE);
