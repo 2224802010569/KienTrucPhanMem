@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -18,18 +19,14 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal">
+
             <ImageButton
                 android:id="@+id/btnBack"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:src="@android:drawable/ic_media_previous"
                 android:background="@android:color/transparent"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="10dp"/>
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_menu"/>
+                android:layout_marginStart="10dp"/>
 
             <TextView
                 android:layout_width="0dp"
@@ -39,11 +36,6 @@
                 android:text="Analytics"
                 android:textSize="18sp"
                 android:textStyle="bold"/>
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_notification"/>
 
         </LinearLayout>
 
@@ -77,11 +69,10 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/txtTitle"
                     android:layout_marginTop="8dp"
-                    android:text="₫ 45.000.000"
+                    android:text="₫ 0"
                     android:textColor="#FFFFFF"
                     android:textSize="26sp"
                     android:textStyle="bold"/>
-
 
                 <Button
                     android:id="@+id/btnDetail"
@@ -114,6 +105,8 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- TITLE -->
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -136,6 +129,54 @@
 
                 </RelativeLayout>
 
+
+                <!-- FILTER BUTTON -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp">
+
+                    <Button
+                        android:id="@+id/btnIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Income"/>
+
+                    <Button
+                        android:id="@+id/btnExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Expense"
+                        android:layout_marginStart="6dp"/>
+
+                    <Button
+                        android:id="@+id/btnDay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Day"
+                        android:layout_marginStart="6dp"/>
+
+                    <Button
+                        android:id="@+id/btnMonth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Month"
+                        android:layout_marginStart="6dp"/>
+
+                    <Button
+                        android:id="@+id/btnYear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Year"
+                        android:layout_marginStart="6dp"/>
+
+                </LinearLayout>
+
+
+                <!-- PIE CHART -->
 
                 <com.github.mikephil.charting.charts.PieChart
                     android:id="@+id/pieChart"
@@ -170,6 +211,7 @@
                     android:text="AI Insights"
                     android:textStyle="bold"
                     android:textSize="16sp"/>
+
                 <TextView
                     android:id="@+id/txtInsight"
                     android:layout_width="wrap_content"
@@ -192,7 +234,7 @@
         </androidx.cardview.widget.CardView>
 
 
-        <!-- RECENT ACTIVITY -->
+        <!-- BAR CHART -->
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -208,13 +250,13 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="Recent Activity"
                     android:textStyle="bold"
                     android:textSize="16sp"
-                    android:textColor="#333333"
-                    android:layout_marginBottom="8dp"/>
+                    android:layout_marginBottom="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
                 <com.github.mikephil.charting.charts.BarChart
                     android:id="@+id/barChart"
                     android:layout_width="match_parent"

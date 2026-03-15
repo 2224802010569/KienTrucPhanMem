@@ -15,6 +15,8 @@ import com.example.fintrack.R;
 import com.example.fintrack.UserService.data.UserRepository;
 import com.example.fintrack.UserService.data.entity.UserEntity;
 import com.example.fintrack.AlertService.view.BudgetActivity;
+import com.example.fintrack.TransactionService.view.AddTransactionActivity;
+import com.example.fintrack.TransactionService.view.CategoryManagementActivity;
 
 public class UserAccountProfileActivity extends AppCompatActivity {
 
@@ -24,6 +26,10 @@ public class UserAccountProfileActivity extends AppCompatActivity {
 
     LinearLayout itemPersonalInfo, itemSecurity, itemLanguage;
     LinearLayout itemNotification, itemDefaultCurrency, itemHelp;
+
+    // ⭐ 2 BUTTON MỚI
+    LinearLayout itemAddTransaction;
+    LinearLayout itemCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,10 @@ public class UserAccountProfileActivity extends AppCompatActivity {
         itemNotification = findViewById(R.id.itemNotification);
         itemDefaultCurrency = findViewById(R.id.itemDefaultCurrency);
         itemHelp = findViewById(R.id.itemHelp);
+
+        // ⭐ INIT 2 NÚT
+        itemAddTransaction = findViewById(R.id.itemAddTransaction);
+        itemCategory = findViewById(R.id.itemCategory);
 
         // ===== LOAD USER =====
         loadUser();
@@ -79,7 +89,7 @@ public class UserAccountProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Language feature removed", Toast.LENGTH_SHORT).show()
         );
 
-        // ⭐ MỞ MÀN BUDGET KHI ẤN NOTIFICATIONS
+        // ⭐ MỞ BUDGET
         itemNotification.setOnClickListener(v -> {
 
             Intent intent = new Intent(
@@ -98,6 +108,30 @@ public class UserAccountProfileActivity extends AppCompatActivity {
         itemHelp.setOnClickListener(v ->
                 Toast.makeText(this, "Help Center", Toast.LENGTH_SHORT).show()
         );
+
+        // ⭐ MỞ ADD TRANSACTION
+        itemAddTransaction.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    UserAccountProfileActivity.this,
+                    AddTransactionActivity.class
+            );
+
+            startActivity(intent);
+
+        });
+
+        // ⭐ MỞ CATEGORY MANAGEMENT
+        itemCategory.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    UserAccountProfileActivity.this,
+                    CategoryManagementActivity.class
+            );
+
+            startActivity(intent);
+
+        });
 
         btnLogout.setOnClickListener(v -> logout());
     }

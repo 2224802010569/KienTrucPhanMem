@@ -27,14 +27,16 @@ public class CheckReminderUseCase {
         for (Reminder r : list) {
 
             if (r.enabled &&
-                    domain.isDueToday(r.dueDay)) {
+                    domain.isDueToday(r.dueDay, r.period)) {
 
-                NotificationHelper.send(context,
-                        "📅 Bill due: "
+                NotificationHelper.send(
+                        context,
+                        "📅 Bill Reminder\n"
                                 + r.title +
-                                " - "
-                                + r.amount
-                                + " VND");
+                                "\nAmount: "
+                                + r.amount +
+                                " VND"
+                );
             }
         }
     }

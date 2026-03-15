@@ -13,8 +13,12 @@ public class AnalyticsDomainService {
         this.repository = repository;
     }
 
-    public List<AnalyticsData> getAnalytics(String userId) {
-        return repository.getAnalyticsData(userId);
+    public List<AnalyticsData> getAnalytics(
+            String userId,
+            String type,
+            String time
+    ) {
+        return repository.getAnalyticsData(userId, type, time);
     }
 
     public String generateInsight(List<AnalyticsData> data){
