@@ -198,6 +198,9 @@ public class AddTransactionActivity extends AppCompatActivity {
         selectedCategoryId = null;
         txtCategoryName.setText("Chọn danh mục");
         txtCategoryIcon.setText("📂");
+
+        edtAmount.setText("");
+        edtNote.setText("");
     }
 
     private void setupCategoryPicker() {

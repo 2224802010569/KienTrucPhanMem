@@ -8,9 +8,12 @@ public class HistoryItem {
     public static final int TYPE_TX = 1;
 
     public int type;
-    public String header;                 // "Hôm nay", "Hôm qua"
-    public TransactionEntity tx;          // giao dịch thật
+    public String header;
+    public TransactionEntity tx;
 
+    public HistoryItem() {}
+
+    // header item
     public static HistoryItem header(String text) {
         HistoryItem i = new HistoryItem();
         i.type = TYPE_HEADER;
@@ -23,5 +26,15 @@ public class HistoryItem {
         i.type = TYPE_TX;
         i.tx = tx;
         return i;
+    }
+
+    public HistoryItem(String header){
+        this.type = TYPE_HEADER;
+        this.header = header;
+    }
+
+    public HistoryItem(TransactionEntity tx){
+        this.type = TYPE_TX;
+        this.tx = tx;
     }
 }

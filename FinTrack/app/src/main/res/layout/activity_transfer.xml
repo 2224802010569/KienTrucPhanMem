@@ -112,9 +112,10 @@
                     android:text="Change"
                     android:textSize="12sp"
                     android:background="@drawable/bg_toggle"
-                    android:layout_marginTop="6dp"
+                    android:minHeight="36dp"
+                    android:paddingHorizontal="12dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"/>
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
 
             <FrameLayout
@@ -189,9 +190,10 @@
                     android:text="Change"
                     android:textSize="12sp"
                     android:background="@drawable/bg_toggle"
-                    android:layout_marginTop="6dp"
+                    android:minHeight="36dp"
+                    android:paddingHorizontal="12dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"/>
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
 
             <FrameLayout

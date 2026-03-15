@@ -127,4 +127,11 @@ public interface TransactionDao {
                     "AND month = :month"
     )
     Double getTotalExpenseByCategory(String userId, String categoryId, String month);
+    @Query(
+            "SELECT * FROM transactions " +
+                    "WHERE (source_account_id = :accountId OR target_account_id = :accountId) " +
+                    "ORDER BY tx_date DESC, created_at DESC " +
+                    "LIMIT 5"
+    )
+    List<TransactionEntity> getRecentByAccount(String accountId);
 }

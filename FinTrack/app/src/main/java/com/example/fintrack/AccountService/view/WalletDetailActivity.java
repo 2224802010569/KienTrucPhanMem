@@ -18,12 +18,20 @@ import java.util.List;
 import com.example.fintrack.TransactionService.view.TransferActivity;
 import com.example.fintrack.TransactionService.view.HistoryActivity;
 import com.example.fintrack.TransactionService.view.AddTransactionActivity;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+import com.example.fintrack.TransactionService.view.TransactionAdapter;
+import com.example.fintrack.TransactionService.view.HistoryItem;
+import com.example.fintrack.TransactionService.api.TransactionApiImpl;
+import com.example.fintrack.TransactionService.data.entity.TransactionEntity;
 public class WalletDetailActivity extends AppCompatActivity {
+    private TransactionApiImpl transactionApi;
     private TextView txtName, txtId, txtBalance;
     private AccountRepository repo;
     private String walletId;
-
+    RecyclerView rvRecent;
+    TransactionAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +118,10 @@ public class WalletDetailActivity extends AppCompatActivity {
                     .setNegativeButton("Cancel", null)
                     .show();
         });
+        transactionApi = new TransactionApiImpl(getApplicationContext());
+        rvRecent = findViewById(R.id.rvRecentTransactions);
+        rvRecent.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
     private void displayWalletInfo(String id) {
@@ -140,6 +152,33 @@ public class WalletDetailActivity extends AppCompatActivity {
         super.onResume();
         if(walletId != null){
             displayWalletInfo(walletId);
+            loadRecentTransactions();
         }
+    }
+    private void loadRecentTransactions(){
+
+        new Thread(() -> {
+
+            List<TransactionEntity> txList =
+                    transactionApi.getRecentByAccount(walletId);
+
+            List<HistoryItem> historyList = new ArrayList<>();
+
+            for(TransactionEntity tx : txList){
+                historyList.add(new HistoryItem(tx));
+            }
+
+            runOnUiThread(() -> {
+
+                adapter = new TransactionAdapter(
+                        historyList,
+                        null
+                );
+
+                rvRecent.setAdapter(adapter);
+
+            });
+
+        }).start();
     }
 }

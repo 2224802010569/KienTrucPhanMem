@@ -92,4 +92,8 @@ public class TransactionApiImpl implements TransactionPort {
             transactionDao.delete(tx);
         }
     }
+    @Override
+    public List<TransactionEntity> getRecentByAccount(String accountId) {
+        return transactionDao.getRecentByAccount(accountId);
+    }
 }

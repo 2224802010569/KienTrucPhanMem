@@ -43,7 +43,22 @@ public class HistoryActivity extends AppCompatActivity {
 
         @Override
         public String toString() {
-            return name; // 👈 Spinner chỉ hiển thị TÊN
+            return name;
+        }
+    }
+
+    static class AccountOption {
+        String id;
+        String name;
+
+        AccountOption(String id, String name){
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        public String toString(){
+            return name;
         }
     }
     /* =================================================== */
@@ -92,13 +107,9 @@ public class HistoryActivity extends AppCompatActivity {
         ));
 
         // ===== WALLET FILTER =====
-        spinnerWallet.setAdapter(new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                new String[]{"ALL", "acc001", "acc002"}
-        ));
+        loadWalletSpinner(spinnerWallet);
 
-        // ===== LOAD CATEGORY FROM DB (ĐÚNG) =====
+        // ===== LOAD CATEGORY FROM DB  =====
         loadCategorySpinner(spinnerCategory);
 
         // ===== ADAPTER =====
@@ -128,11 +139,19 @@ public class HistoryActivity extends AppCompatActivity {
             final String keywordFinal =
                     edtKeyword.getText().toString().trim();
 
-            final String walletRaw =
-                    spinnerWallet.getSelectedItem().toString();
+            AccountOption selectedWallet =
+                    (AccountOption) spinnerWallet.getSelectedItem();
 
-            final String dateRaw =
-                    spinnerDate.getSelectedItem().toString();
+            String accountFinal =
+                    (selectedWallet == null || selectedWallet.id == null)
+                            ? null
+                            : selectedWallet.id;
+
+            String dateRaw = "ALL";
+
+            if (spinnerDate.getSelectedItem() != null) {
+                dateRaw = spinnerDate.getSelectedItem().toString();
+            }
 
             CategoryOption selectedCategory =
                     (CategoryOption) spinnerCategory.getSelectedItem();
@@ -168,9 +187,6 @@ public class HistoryActivity extends AppCompatActivity {
                     fromDateFinal = null;
                     toDateFinal = null;
             }
-
-            final String accountFinal =
-                    "ALL".equals(walletRaw) ? null : walletRaw;
 
             new Thread(() -> {
                 FintrackDatabase db =
@@ -271,6 +287,37 @@ public class HistoryActivity extends AppCompatActivity {
                 // load list sau khi category sẵn sàng
                 btnSearch.performClick();
             });
+        }).start();
+    }
+    private void loadWalletSpinner(Spinner spinnerWallet){
+
+        new Thread(() -> {
+
+            FintrackDatabase db =
+                    FintrackDatabase.getInstance(getApplicationContext());
+
+            List<com.example.fintrack.AccountService.model.AccountEntity> accounts =
+                    db.accountDao().getAccountsByUser(currentUserId);
+
+            List<AccountOption> options = new ArrayList<>();
+            options.add(new AccountOption(null,"ALL"));
+
+            for (com.example.fintrack.AccountService.model.AccountEntity a : accounts){
+                options.add(new AccountOption(a.accountId,a.name));
+            }
+
+            runOnUiThread(() -> {
+
+                spinnerWallet.setAdapter(
+                        new ArrayAdapter<>(
+                                HistoryActivity.this,
+                                android.R.layout.simple_spinner_dropdown_item,
+                                options
+                        )
+                );
+
+            });
+
         }).start();
     }
 }
