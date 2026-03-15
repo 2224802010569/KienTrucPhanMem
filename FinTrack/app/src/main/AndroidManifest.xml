@@ -29,16 +29,18 @@
             android:name=".AccountService.view.AccountDashboardActivity"
             android:exported="false"/>
 
+        <!-- THÊM WALLET DETAIL ACTIVITY -->
+        <activity
+            android:name=".AccountService.view.WalletDetailActivity"
+            android:exported="false"/>
+
         <activity
             android:name=".UserService.view.SplashActivity"
             android:exported="true">
 
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
-
             </intent-filter>
 
         </activity>
@@ -145,18 +147,14 @@
             android:exported="true">
 
             <intent-filter>
-
                 <action android:name="android.intent.action.VIEW"/>
-
                 <category android:name="android.intent.category.DEFAULT"/>
-
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:scheme="https"
                     android:host="fintrackapp"
                     android:path="/resetpassword"/>
-
             </intent-filter>
 
         </activity>
