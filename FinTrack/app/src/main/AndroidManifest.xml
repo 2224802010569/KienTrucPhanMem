@@ -30,16 +30,7 @@
         <activity
 
             android:name=".TransactionService.view.ImportBankStatementActivity"
-            android:exported="true">
-
-
-
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-
-        </activity>
+            android:exported="false"/>
         <activity
             android:name=".UserService.view.LoginActivity"
             android:exported="false" />
@@ -86,11 +77,8 @@
             android:name=".TransactionService.view.ScanReceiptActivity"
             android:exported="false"/>
         <activity
-
             android:name=".TransactionService.view.CategoryManagementActivity"
             android:exported="true" />
-
-
         <activity
             android:name=".AlertService.view.AddReminderActivity"
             android:exported="false"/>
