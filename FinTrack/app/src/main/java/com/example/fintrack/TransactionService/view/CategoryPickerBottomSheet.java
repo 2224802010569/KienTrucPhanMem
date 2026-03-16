@@ -18,7 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 public class CategoryPickerBottomSheet extends BottomSheetDialogFragment {
 
     public interface Listener {
@@ -89,14 +90,25 @@ public class CategoryPickerBottomSheet extends BottomSheetDialogFragment {
 
     private void loadData(CategoryChildAdapter adapter) {
         new Thread(() -> {
+
             FintrackDatabase db =
                     FintrackDatabase.getInstance(requireContext());
 
-            List<CategoryEntity> list =
-                    db.categoryDao().getAll("u001");
+            UserRepository userRepo =
+                    new UserRepository(requireContext());
 
-            // LỌC THEO THU / CHI
+            UserEntity currentUser =
+                    userRepo.getCurrentUser();
+
+            if(currentUser == null) return;
+
+            String currentUserId = currentUser.user_id;
+
+            List<CategoryEntity> list =
+                    db.categoryDao().getAll(currentUserId);
+
             List<CategoryEntity> result = new ArrayList<>();
+
             for (CategoryEntity c : list) {
                 if (txType.equals(c.tx_type_id)) {
                     result.add(c);
@@ -106,6 +118,7 @@ public class CategoryPickerBottomSheet extends BottomSheetDialogFragment {
             requireActivity().runOnUiThread(() ->
                     adapter.update(result)
             );
+
         }).start();
     }
 }

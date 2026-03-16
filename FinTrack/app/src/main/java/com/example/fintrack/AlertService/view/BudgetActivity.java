@@ -20,9 +20,10 @@ import com.example.fintrack.TransactionService.data.entity.CategoryEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 public class BudgetActivity extends AppCompatActivity {
-
+    private String currentUserId;
     private Spinner spCategory, spPeriod;
     private EditText etAmount;
     private CheckBox cbNotify;
@@ -30,6 +31,9 @@ public class BudgetActivity extends AppCompatActivity {
     private Button btnCreate, btnAnalytics;
 
     private TextView tvTotalSpent;
+
+    // ⭐ NÚT BACK
+    private ImageButton btnBack;
 
     private List<CategoryEntity> categoryList = new ArrayList<>();
 
@@ -43,7 +47,7 @@ public class BudgetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_budget);
 
-        // ⭐ xin quyền notification Android 13+
+
         if (Build.VERSION.SDK_INT >= 33) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
                     != getPackageManager().PERMISSION_GRANTED) {
@@ -54,6 +58,12 @@ public class BudgetActivity extends AppCompatActivity {
                 );
             }
         }
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        this.currentUserId = currentUser.user_id;
 
         initViews();
         initSpinners();
@@ -63,6 +73,8 @@ public class BudgetActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+
+        btnBack = findViewById(R.id.btnBack);
 
         spCategory = findViewById(R.id.spCategory);
         spPeriod = findViewById(R.id.spPeriod);
@@ -76,6 +88,11 @@ public class BudgetActivity extends AppCompatActivity {
         rvBudgets.setLayoutManager(new LinearLayoutManager(this));
 
         tvTotalSpent = findViewById(R.id.tvTotalSpent);
+
+        // ⭐ SỰ KIỆN BACK
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void initSpinners() {
@@ -85,7 +102,9 @@ public class BudgetActivity extends AppCompatActivity {
             FintrackDatabase db =
                     FintrackDatabase.getInstance(getApplicationContext());
 
-            categoryList = db.categoryDao().getAll("u001");
+            categoryList =
+                    db.categoryDao().getParentByType(currentUserId, "EXPENSE");
+
 
             List<String> names = new ArrayList<>();
 
@@ -149,8 +168,8 @@ public class BudgetActivity extends AppCompatActivity {
 
             if (cbNotify.isChecked()) {
 
-                new CheckBudgetWarningUseCase(repo)
-                        .execute(BudgetActivity.this);
+                new CheckBudgetWarningUseCase(BudgetActivity.this, repo)
+                        .execute();
             }
 
         });
@@ -187,7 +206,7 @@ public class BudgetActivity extends AppCompatActivity {
 
                 Double spent =
                         db.transactionDao().getTotalExpenseByCategory(
-                                "u001",
+                                currentUserId,
                                 alert.categoryId,
                                 getCurrentMonth()
                         );
@@ -214,8 +233,8 @@ public class BudgetActivity extends AppCompatActivity {
 
                 if (cbNotify.isChecked()) {
 
-                    new CheckBudgetWarningUseCase(repo)
-                            .execute(BudgetActivity.this);
+                    new CheckBudgetWarningUseCase(BudgetActivity.this, repo)
+                            .execute();
                 }
 
             });

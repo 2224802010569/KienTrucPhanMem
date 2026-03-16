@@ -22,7 +22,7 @@ import java.util.List;
 public class ManageWalletActivity extends AppCompatActivity {
     private boolean isEditMode = false;
     private String walletIdToEdit;
-    private AccountRepository repo = AccountRepository.getInstance();
+    private AccountRepository repo;
 
     private AutoCompleteTextView spinnerType;
 
@@ -30,7 +30,7 @@ public class ManageWalletActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_wallet);
-
+        repo = AccountRepository.getInstance(this);
         ImageButton btnBack = findViewById(R.id.btnBack);
         TextInputEditText edtName = findViewById(R.id.edtName);
         TextInputEditText edtBalance = findViewById(R.id.edtBalance);
@@ -70,10 +70,16 @@ public class ManageWalletActivity extends AppCompatActivity {
             }
             try {
                 double balance = Double.parseDouble(balanceStr);
+
+                // Lấy thông tin user hiện tại để gán vào ví
+                com.example.fintrack.UserService.data.UserRepository userRepo =
+                        new com.example.fintrack.UserService.data.UserRepository(this);
+                String currentUserId = userRepo.getCurrentUser().user_id;
+
                 if (isEditMode) {
-                    repo.updateAccount(new AccountEntity(walletIdToEdit, "u001", name, typeId, balance));
+                    repo.updateAccount(new AccountEntity(walletIdToEdit, currentUserId, name, typeId, balance));
                 } else {
-                    repo.addAccount(new AccountEntity(repo.generateNewId(), "u001", name, typeId, balance));
+                    repo.addAccount(new AccountEntity(repo.generateNewId(), currentUserId, name, typeId, balance));
                 }
                 finish();
             } catch (NumberFormatException e) {

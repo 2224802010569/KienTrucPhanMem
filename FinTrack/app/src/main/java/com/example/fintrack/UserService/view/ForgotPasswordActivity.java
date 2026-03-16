@@ -36,7 +36,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         txtLogin.setOnClickListener(v -> finish());
 
         btnSend.setOnClickListener(v -> {
-
             String email = edtEmail.getText().toString().trim();
 
             if (email.isEmpty()) {
@@ -45,20 +44,20 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             }
 
             UserRepository repo = new UserRepository(this);
-
             UserEntity user = repo.getUserByEmail(email);
 
             if (user == null) {
-                Toast.makeText(this,
-                        "Email không tồn tại trong hệ thống",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Email không tồn tại trong hệ thống", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Toast.makeText(this,
-                    "Email tồn tại. Hệ thống sẽ gửi thông báo reset.",
-                    Toast.LENGTH_LONG).show();
+            com.example.fintrack.NotificationService.api.NotificationApiImpl notifApi =
+                    new com.example.fintrack.NotificationService.api.NotificationApiImpl(this);
 
+            notifApi.requestResetPassword(email);
+            android.content.SharedPreferences prefs = getSharedPreferences("USER_SESSION", MODE_PRIVATE);
+            prefs.edit().putInt("attempt_" + user.full_name, 0).apply();
+            Toast.makeText(this, "Hệ thống đã gửi link reset mật khẩu vào email của bạn.", Toast.LENGTH_LONG).show();
             finish();
         });
 

@@ -19,8 +19,6 @@ import java.util.List;
 public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountViewHolder> {
     private List<AccountEntity> accountList;
 
-    private AccountRepository repo = AccountRepository.getInstance();
-
     public AccountAdapter(List<AccountEntity> accountList) {
         this.accountList = accountList;
     }
@@ -42,7 +40,6 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
 
         holder.itemView.setOnClickListener(v -> {
             Context context = v.getContext();
-            // Đã dùng Hằng số
             if (AccountEntity.STATUS_HIDDEN.equals(account.status)) {
                 showRestoreDialog(context, account, holder.getAdapterPosition());
             } else {
@@ -58,8 +55,9 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
                 .setTitle("Restore Wallet")
                 .setMessage("Do you want to unhide the wallet \"" + account.name + "\" and display it again on the main screen?")
                 .setPositiveButton("Confirm", (dialog, which) -> {
-                    // Đã dùng Hằng số
-                    repo.updateStatus(account.accountId, AccountEntity.STATUS_ACTIVE);
+
+                    // Thêm Context vào đây
+                    AccountRepository.getInstance(context).updateStatus(account.accountId, AccountEntity.STATUS_ACTIVE);
 
                     accountList.remove(position);
                     notifyItemRemoved(position);

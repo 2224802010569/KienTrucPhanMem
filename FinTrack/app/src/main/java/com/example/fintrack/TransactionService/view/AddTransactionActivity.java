@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.Intent;
 
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,25 +18,27 @@ import com.example.fintrack.R;
 import com.example.fintrack.TransactionService.data.db.FintrackDatabase;
 import com.example.fintrack.TransactionService.domain.usecase.AddTransactionUseCase;
 import com.example.fintrack.AccountService.api.AccountApiImpl;
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import com.example.fintrack.AccountService.model.AccountEntity;
-
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 public class AddTransactionActivity extends AppCompatActivity {
 
     private final DecimalFormat df = new DecimalFormat("#,###");
-
+    private String currentUserId;
     private EditText edtAmount, edtNote;
     private Button btnIncome, btnExpense, btnSave;
     private TextView txtCategoryName, txtCategoryIcon;
     private TextView txtAccountName, txtBalance;
     private TextView txtDateTime;
 
-    private String currentTxType = "EXPENSE";
+    private String currentTxType = "INCOME";
     private String selectedCategoryId = null;
     private String selectedAccountId = null;
 
@@ -47,6 +48,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private List<AccountEntity> accounts;
 
     private AccountApiImpl accountApi;
+    private UserRepository userRepo;
 
     @OptIn(markerClass = ExperimentalGetImage.class)
     @Override
@@ -55,14 +57,28 @@ public class AddTransactionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_transaction_v2);
 
         accountApi = new AccountApiImpl(getApplicationContext());
+        userRepo = new UserRepository(this);
 
         initViews();
+        switchToggle(false);
+        TextView btnCancel = findViewById(R.id.btnCancel);
+        TextView btnConfirm = findViewById(R.id.btnConfirm);
 
+        btnCancel.setOnClickListener(v -> finish());
+
+        btnConfirm.setOnClickListener(v -> addTransaction());
         selectedDate = LocalDate.now();
         selectedTime = LocalTime.now();
         updateDateTimeText();
 
         Button btnScanReceipt;
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        currentUserId = currentUser.user_id;
+
         receiveScanData();
 
         loadAccounts();
@@ -72,18 +88,7 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         setupToggleButtons();
         setupCategoryPicker();
-
-        // ===== THÊM CODE NHẬN DỮ LIỆU CSV =====
-        readCSVData();
-
         btnSave.setOnClickListener(v -> addTransaction());
-
-        Button btnImportCSV = findViewById(R.id.btnImportCSV);
-
-        btnImportCSV.setOnClickListener(v -> {
-            Intent intent = new Intent(AddTransactionActivity.this, ImportBankStatementActivity.class);
-            startActivity(intent);
-        });
 
         btnScanReceipt = findViewById(R.id.btnScanReceipt);
         btnScanReceipt.setOnClickListener(v -> {
@@ -95,6 +100,8 @@ public class AddTransactionActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
+
+        findViewById(R.id.btnCancel).setOnClickListener(v -> finish());
     }
 
     private void initViews() {
@@ -118,8 +125,11 @@ public class AddTransactionActivity extends AppCompatActivity {
     private void loadAccounts() {
 
         new Thread(() -> {
+            UserEntity currentUser = userRepo.getCurrentUser();
+            if (currentUser == null) return;
 
-            accounts = accountApi.getAccountsByUser("u001");
+
+            accounts = accountApi.getAccountsByUser(currentUser.user_id);
 
             runOnUiThread(() -> {
 
@@ -131,12 +141,25 @@ public class AddTransactionActivity extends AppCompatActivity {
                     return;
                 }
 
-                AccountEntity acc = accounts.get(0);
+                // Nếu có ACCOUNT_ID truyền từ màn hình Detail Wallet
+                String preselectedId = getIntent().getStringExtra("ACCOUNT_ID");
+                AccountEntity selectedAcc = null;
 
-                selectedAccountId = acc.accountId;
+                if (preselectedId != null) {
+                    for (AccountEntity a : accounts) {
+                        if (a.accountId.equals(preselectedId)) {
+                            selectedAcc = a;
+                            break;
+                        }
+                    }
+                }
 
-                txtAccountName.setText(acc.name);
-                txtBalance.setText("Số dư: " + df.format(acc.balance) + " đ");
+                if (selectedAcc == null) selectedAcc = accounts.get(0);
+
+                selectedAccountId = selectedAcc.accountId;
+
+                txtAccountName.setText(selectedAcc.name);
+                txtBalance.setText("Số dư: " + df.format(selectedAcc.balance) + " đ");
 
                 findViewById(R.id.layoutAccount)
                         .setOnClickListener(v ->
@@ -171,9 +194,18 @@ public class AddTransactionActivity extends AppCompatActivity {
             currentTxType = "INCOME";
             switchToggle(false);
         });
+
+        // Nhận TX_TYPE mặc định nếu có (ví dụ từ nút Add Money ở ví)
+        String type = getIntent().getStringExtra("TX_TYPE");
+        if ("INCOME".equals(type)) {
+            currentTxType = "INCOME";
+            switchToggle(false);
+        }
     }
 
     private void switchToggle(boolean expense) {
+
+        currentTxType = expense ? "EXPENSE" : "INCOME";
 
         if (expense) {
 
@@ -195,6 +227,9 @@ public class AddTransactionActivity extends AppCompatActivity {
         selectedCategoryId = null;
         txtCategoryName.setText("Chọn danh mục");
         txtCategoryIcon.setText("📂");
+
+        edtAmount.setText("");
+        edtNote.setText("");
     }
 
     private void setupCategoryPicker() {
@@ -264,51 +299,6 @@ public class AddTransactionActivity extends AppCompatActivity {
         ).show();
     }
 
-    // ===== HÀM MỚI NHẬN DỮ LIỆU CSV =====
-
-    private void readCSVData() {
-
-        Intent intent = getIntent();
-
-        if (intent == null) return;
-
-        String date = intent.getStringExtra("csv_date");
-        double amount = intent.getDoubleExtra("csv_amount", 0);
-        String note = intent.getStringExtra("csv_note");
-        String type = intent.getStringExtra("csv_type");
-
-        if (amount != 0) {
-            edtAmount.setText(String.valueOf(amount));
-        }
-
-        if (note != null) {
-            edtNote.setText(note);
-        }
-
-        if (date != null) {
-
-            try {
-
-                selectedDate = LocalDate.parse(date);
-                updateDateTimeText();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (type != null) {
-
-            currentTxType = type;
-
-            if ("EXPENSE".equals(type)) {
-                switchToggle(true);
-            } else {
-                switchToggle(false);
-            }
-        }
-    }
-
     private void addTransaction() {
 
         String amountStr = edtAmount.getText().toString().trim();
@@ -336,6 +326,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         new Thread(() -> {
 
             try {
+                UserEntity currentUser = userRepo.getCurrentUser();
+                if (currentUser == null) return;
 
                 FintrackDatabase db =
                         FintrackDatabase.getInstance(getApplicationContext());
@@ -346,7 +338,8 @@ public class AddTransactionActivity extends AppCompatActivity {
                         db.alertDao(),
                         accountApi
                 ).execute(
-                        "u001",
+
+                        currentUser.user_id,
                         currentTxType,
                         selectedAccountId,
                         selectedCategoryId,
@@ -361,7 +354,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                             "Đã thêm giao dịch",
                             Toast.LENGTH_SHORT).show();
 
-                    loadAccounts();
+                    finish(); // Quay lại màn hình trước đó sau khi lưu
                 });
 
             } catch (Exception e) {
@@ -394,10 +387,7 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         if (date != null && !date.isEmpty()) {
             try {
-                DateTimeFormatter formatter =
-                        DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
-                selectedDate = LocalDate.parse(date, formatter);
+                selectedDate = LocalDate.parse(date);
                 updateDateTimeText();
             } catch (Exception e) {
                 e.printStackTrace();

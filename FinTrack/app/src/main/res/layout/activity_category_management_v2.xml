@@ -6,15 +6,31 @@
     android:layout_height="match_parent">
 
     <!-- HEADER -->
-    <TextView
-        android:text="Manage Categories"
-        android:textStyle="bold"
-        android:textSize="22sp"
-        android:textColor="#222222"
-        android:layout_marginBottom="12dp"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"/>
+        android:layout_height="50dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnBackCategory"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Back"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:text="Manage Categories"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="#222222"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
 
     <!-- ADD CATEGORY -->
     <Button

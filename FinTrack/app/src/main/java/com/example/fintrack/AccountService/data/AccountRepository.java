@@ -1,109 +1,77 @@
 package com.example.fintrack.AccountService.data;
 
+import android.content.Context;
 import com.example.fintrack.AccountService.model.AccountEntity;
 import com.example.fintrack.AccountService.model.AccountTypeEntity;
-import java.util.ArrayList;
+import com.example.fintrack.TransactionService.data.db.FintrackDatabase;
 import java.util.List;
+import java.util.UUID;
 
 public class AccountRepository {
-    // 1. TẠO SINGLETON
     private static AccountRepository instance;
+    private final AccountDao accountDao;
 
-    // 2. GIỮ NGUYÊN MOCK DATA NHƯ CŨ
-    private static List<AccountEntity> list = new ArrayList<>();
-    private static List<String> transactionMockData = new ArrayList<>();
-    private static List<AccountTypeEntity> accountTypes = new ArrayList<>();
-
-    static {
-        // Khởi tạo dữ liệu mẫu
-        list.add(new AccountEntity("acc001", "u001", "Ví cá nhân", AccountEntity.TYPE_WALLET, 2000000));
-        list.add(new AccountEntity("acc002", "u001", "Tài khoản Vietcombank", AccountEntity.TYPE_BANK, 15000000));
-        transactionMockData.add("acc001");
-
-        accountTypes.add(new AccountTypeEntity(AccountEntity.TYPE_WALLET, "Ví tiền", "Tiền mặt"));
-        accountTypes.add(new AccountTypeEntity(AccountEntity.TYPE_BANK, "Ngân hàng", "Tài khoản ngân hàng"));
-        accountTypes.add(new AccountTypeEntity("CREDIT", "Thẻ tín dụng", "Chi tiêu trước trả sau"));
-        accountTypes.add(new AccountTypeEntity("SAVING", "Tiết kiệm", "Khoản tích lũy"));
+    private AccountRepository(Context context) {
+        accountDao = FintrackDatabase.getInstance(context).accountDao();
+        initDefaultTypes();
     }
 
-    private AccountRepository() {}
-
-    public static AccountRepository getInstance() {
+    // Yêu cầu truyền Context để gọi được Database
+    public static AccountRepository getInstance(Context context) {
         if (instance == null) {
-            instance = new AccountRepository();
+            instance = new AccountRepository(context.getApplicationContext());
         }
         return instance;
     }
 
+    private void initDefaultTypes() {
+        if (accountDao.getAllTypes().isEmpty()) {
+            accountDao.insertType(new AccountTypeEntity(AccountEntity.TYPE_WALLET, "Ví tiền", "Tiền mặt"));
+            accountDao.insertType(new AccountTypeEntity(AccountEntity.TYPE_BANK, "Ngân hàng", "Tài khoản ngân hàng"));
+        }
+    }
 
-    public List<AccountTypeEntity> getAccountTypes() { return accountTypes; }
-    public List<AccountEntity> getMockData() { return list; }
-    public boolean hasTransactions(String id) { return transactionMockData.contains(id); }
-    public void addAccount(AccountEntity account) { list.add(account); }
+    public List<AccountTypeEntity> getAccountTypes() { return accountDao.getAllTypes(); }
+
+    // LẤY VÍ ĐÚNG CỦA USER ĐANG ĐĂNG NHẬP
+    public List<AccountEntity> getAccountsByUser(String userId) {
+        return accountDao.getAccountsByUser(userId);
+    }
+
+    public AccountEntity getAccountById(String id) { return accountDao.getById(id); }
+
+    public void addAccount(AccountEntity account) { accountDao.insertAccount(account); }
+
+    public void updateAccount(AccountEntity account) { accountDao.updateAccount(account); }
+
+    public void updateStatus(String id, String status) {
+        AccountEntity acc = getAccountById(id);
+        if (acc != null) {
+            acc.status = status;
+            updateAccount(acc);
+        }
+    }
+
+    public void deleteAccount(String id) { accountDao.deleteAccount(id); }
+
+    public boolean hasTransactions(String id) { return false; } // Sẽ kết nối với Transaction sau
 
     public void addAccountType(String id, String name, String description) {
-        for (AccountTypeEntity t : accountTypes) {
-            if (t.typeid.equals(id)) return;
-        }
-        accountTypes.add(new AccountTypeEntity(id, name, description));
-    }
-
-    public String generateNewId() {
-        int maxId = 0;
-        for (AccountEntity acc : list) {
-            try {
-                int idNum = Integer.parseInt(acc.accountId.replaceAll("[^0-9]", ""));
-                if (idNum > maxId) maxId = idNum;
-            } catch (Exception ignored) { }
-        }
-        return String.format("acc%03d", maxId + 1);
-    }
-
-    public void updateAccount(AccountEntity updatedAccount) {
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).accountId.equals(updatedAccount.accountId)) {
-                list.set(i, updatedAccount);
-                return;
-            }
-        }
+        accountDao.insertType(new AccountTypeEntity(id, name, description));
     }
 
     public boolean isAccountTypeExists(String id) {
-        for (AccountTypeEntity t : accountTypes) {
+        for (AccountTypeEntity t : getAccountTypes()) {
             if (t.typeid.equals(id)) return true;
         }
         return false;
     }
 
-    public AccountEntity getAccountById(String id) {
-        for (AccountEntity acc : list) {
-            if (acc.accountId.equals(id)) return acc;
-        }
-        return null;
-    }
+    public boolean isAccountTypeInUse(String typeId) { return false; }
 
-    public boolean isAccountTypeInUse(String id) {
-        for (AccountEntity a : list) {
-            if (a.typeId.equals(id)) return true;
-        }
-        return false;
-    }
+    public void deleteAccountType(String typeId) { accountDao.deleteAccountType(typeId); }
 
-    public void deleteAccount(String id) {
-        list.removeIf(account -> account.accountId.equals(id));
-    }
-
-    public void deleteAccountType(String typeId) {
-        if (typeId.equals(AccountEntity.TYPE_WALLET) || typeId.equals(AccountEntity.TYPE_BANK)) return;
-        accountTypes.removeIf(type -> type.typeid.equals(typeId));
-    }
-
-    public void updateStatus(String id, String status) {
-        for (AccountEntity acc : list) {
-            if (acc.accountId.equals(id)) {
-                acc.status = status;
-                return;
-            }
-        }
+    public String generateNewId() {
+        return "acc_" + UUID.randomUUID().toString().substring(0, 8);
     }
 }

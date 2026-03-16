@@ -102,4 +102,9 @@ public class UserRepository {
                 .clear()
                 .apply();
     }
+
+    // ================= FORGOT PASSWORD =================
+    public void updatePasswordByEmail(String email, String newPassword) {
+        userDao.updatePasswordByEmail(email, newPassword);
+    }
 }

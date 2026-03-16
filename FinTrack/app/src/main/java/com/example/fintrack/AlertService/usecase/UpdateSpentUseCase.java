@@ -5,8 +5,10 @@ import android.content.Context;
 import com.example.fintrack.AlertService.data.AlertRepository;
 import com.example.fintrack.AlertService.entity.BudgetAlert;
 import com.example.fintrack.AlertService.service.AlertDomainService;
-import com.example.fintrack.NotificationService.service.NotificationHelper;
+import com.example.fintrack.NotificationService.data.NotificationRepository;
+import com.example.fintrack.NotificationService.data.entity.AppNotification;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import com.example.fintrack.TransactionService.port.TransactionPort;
@@ -16,10 +18,13 @@ public class UpdateSpentUseCase {
 
     private final AlertRepository repo;
     private final TransactionPort transactionPort;
+    private final NotificationRepository notificationRepo;
+    private final DecimalFormat df = new DecimalFormat("#,###");
 
     public UpdateSpentUseCase(Context context, AlertRepository repo) {
         this.repo = repo;
         this.transactionPort = new TransactionApiImpl(context);
+        this.notificationRepo = new NotificationRepository(context);
     }
 
     public void execute(Context context, String userId, String categoryId, String month) {
@@ -47,20 +52,27 @@ public class UpdateSpentUseCase {
             }
 
             if (domain.isWarning(alert) && !alert.triggered) {
+                String msg = String.format("⚠ Budget 80%% reached for %s. Spent: %s / %s đ", 
+                        alert.categoryName, df.format(alert.spent), df.format(alert.limitAmount));
 
-                NotificationHelper.send(
-                        context,
-                        "⚠ Budget 80% reached for " + alert.categoryName
+                notificationRepo.pushAndSave(
+                        "Budget Warning",
+                        msg,
+                        AppNotification.TYPE_ALERT
                 );
 
                 alert.triggered = true;
             }
 
             if (domain.isExceeded(alert)) {
+                double overAmount = alert.spent - alert.limitAmount;
+                String msg = String.format("🚨 Budget exceeded for %s! Over by %s đ (Total spent: %s đ)", 
+                        alert.categoryName, df.format(overAmount), df.format(alert.spent));
 
-                NotificationHelper.send(
-                        context,
-                        "🚨 Budget exceeded for " + alert.categoryName
+                notificationRepo.pushAndSave(
+                        "Budget Exceeded",
+                        msg,
+                        AppNotification.TYPE_ALERT
                 );
             }
         }

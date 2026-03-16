@@ -24,9 +24,12 @@ import com.example.fintrack.TransactionService.domain.usecase.DeleteCategoryUseC
 
 import java.util.ArrayList;
 import java.util.List;
+import android.widget.ImageButton;
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 
 public class CategoryManagementActivity extends AppCompatActivity {
-
+    private String currentUserId;
     // ===== UI =====
     private RecyclerView rvParent, rvChild;
     private Button btnExpense, btnIncome;
@@ -54,7 +57,16 @@ public class CategoryManagementActivity extends AppCompatActivity {
 
         Button btnAddCategory = findViewById(R.id.btnAddCategory);
         btnAddCategory.setOnClickListener(v -> showCategoryDialog(null));
+        ImageButton btnBack = findViewById(R.id.btnBackCategory);
 
+        btnBack.setOnClickListener(v -> finish());
+
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        currentUserId = currentUser.user_id;
 
         // ===== LAYOUT MANAGER =====
         rvParent.setLayoutManager(new GridLayoutManager(this, 2));
@@ -125,7 +137,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
     private void loadParents(String type) {
         new Thread(() -> {
             List<CategoryEntity> list =
-                    db.categoryDao().getParentByType(type);
+                    db.categoryDao().getParentByType(currentUserId, type);
 
 
             runOnUiThread(() -> {
@@ -139,7 +151,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
     private void loadChildren(String parentId) {
         new Thread(() -> {
             List<CategoryEntity> children =
-                    db.categoryDao().getChildren(parentId);
+                    db.categoryDao().getChildren(currentUserId, parentId);
 
             runOnUiThread(() -> childAdapter.update(children));
         }).start();
@@ -149,7 +161,8 @@ public class CategoryManagementActivity extends AppCompatActivity {
     private void deleteCategory(CategoryEntity c) {
         new Thread(() -> {
             try {
-                new DeleteCategoryUseCase(db.categoryDao()).execute(c);
+                new DeleteCategoryUseCase(db.categoryDao())
+                        .execute(currentUserId, c);
                 loadParents(c.tx_type_id);
             } catch (Exception e) {
                 runOnUiThread(() ->
@@ -182,7 +195,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
 
         new Thread(() -> {
             List<CategoryEntity> parents =
-                    db.categoryDao().getParentCategories("u001");
+                    db.categoryDao().getParentCategories(currentUserId);
 
             CategoryEntity none = new CategoryEntity();
             none.category_id = "NONE";
@@ -234,7 +247,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
                             type,
                             icon,
                             parentId,
-                            "u001"
+                            currentUserId
                     );
                 }
                 else {

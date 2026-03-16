@@ -14,7 +14,6 @@ import java.util.List;
 public class HiddenWalletsActivity extends AppCompatActivity {
     private AccountAdapter adapter;
     private List<AccountEntity> hiddenList = new ArrayList<>();
-    private AccountRepository repo = AccountRepository.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +32,16 @@ public class HiddenWalletsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         hiddenList.clear();
-        for (AccountEntity acc : repo.getMockData()) {
-            if (AccountEntity.STATUS_HIDDEN.equals(acc.status)) {
-                hiddenList.add(acc);
+
+        com.example.fintrack.UserService.data.UserRepository userRepo = new com.example.fintrack.UserService.data.UserRepository(this);
+        com.example.fintrack.UserService.data.entity.UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser != null) {
+            AccountRepository repo = AccountRepository.getInstance(this);
+            for (AccountEntity acc : repo.getAccountsByUser(currentUser.user_id)) {
+                if (AccountEntity.STATUS_HIDDEN.equals(acc.status)) {
+                    hiddenList.add(acc);
+                }
             }
         }
         adapter.notifyDataSetChanged();

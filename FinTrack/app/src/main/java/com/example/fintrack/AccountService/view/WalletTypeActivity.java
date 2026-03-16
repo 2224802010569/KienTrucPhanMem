@@ -14,14 +14,14 @@ import com.example.fintrack.R;
 public class WalletTypeActivity extends AppCompatActivity {
 
     private RecyclerView rvTypes;
-    private AccountRepository repo = AccountRepository.getInstance(); // Singleton
+    private AccountRepository repo;
     private WalletTypeAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet_type_list);
-
+        repo = AccountRepository.getInstance(this);
         rvTypes = findViewById(R.id.rvWalletTypes);
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());

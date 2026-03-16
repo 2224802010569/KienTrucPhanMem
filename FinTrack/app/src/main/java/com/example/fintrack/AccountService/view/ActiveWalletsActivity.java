@@ -15,8 +15,6 @@ public class ActiveWalletsActivity extends AppCompatActivity {
     private AccountAdapter adapter;
     private List<AccountEntity> activeList = new ArrayList<>();
 
-    private AccountRepository repo = AccountRepository.getInstance();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +32,16 @@ public class ActiveWalletsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         activeList.clear();
-        for (AccountEntity acc : repo.getMockData()) {
-            if (acc.status == null || acc.status.isEmpty() || acc.status.equalsIgnoreCase(AccountEntity.STATUS_ACTIVE)) {
-                activeList.add(acc);
+
+        com.example.fintrack.UserService.data.UserRepository userRepo = new com.example.fintrack.UserService.data.UserRepository(this);
+        com.example.fintrack.UserService.data.entity.UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser != null) {
+            AccountRepository repo = AccountRepository.getInstance(this);
+            for (AccountEntity acc : repo.getAccountsByUser(currentUser.user_id)) {
+                if (acc.status == null || acc.status.isEmpty() || acc.status.equalsIgnoreCase(AccountEntity.STATUS_ACTIVE)) {
+                    activeList.add(acc);
+                }
             }
         }
         adapter.notifyDataSetChanged();

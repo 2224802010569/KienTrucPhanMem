@@ -96,23 +96,83 @@
                 android:layout_marginTop="32dp"
                 android:orientation="horizontal"
                 android:padding="16dp"
+                android:background="#FFFFFF"
+                android:gravity="center"
                 android:elevation="2dp">
 
+                <!-- Add Money -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
+
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/btnAddMoney"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:fabSize="mini"
-                        app:srcCompat="@android:drawable/ic_input_add"
                         app:backgroundTint="#E8F5E9"
                         app:tint="#2E7D32"
-                        android:contentDescription="Add Money" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Add Money" android:textSize="12sp" android:layout_marginTop="4dp"/>
+                        app:srcCompat="@android:drawable/ic_input_add"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add Money"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"/>
+                </LinearLayout>
+
+                <!-- Transfer -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/btnTransfer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fabSize="mini"
+                        app:backgroundTint="#E3F2FD"
+                        app:tint="#1565C0"
+                        app:srcCompat="@android:drawable/ic_menu_send"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Transfer"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"/>
+                </LinearLayout>
+
+                <!-- Statements -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/btnStatements"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fabSize="mini"
+                        app:backgroundTint="#E0F2F1"
+                        app:tint="#00695C"
+                        app:srcCompat="@android:drawable/ic_menu_agenda"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Statements"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -125,11 +185,11 @@
                 android:textColor="#000000"
                 android:textStyle="bold" />
 
-            <include
-                layout="@layout/item_wallet"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRecentTransactions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="12dp"/>
 
         </LinearLayout>
     </ScrollView>

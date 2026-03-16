@@ -1,6 +1,7 @@
 package com.example.fintrack.AnalyticService.view;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -9,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.fintrack.R;
 import com.example.fintrack.TransactionService.data.db.FintrackDatabase;
 import com.example.fintrack.TransactionService.data.entity.TransactionEntity;
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.*;
@@ -23,6 +26,7 @@ public class TrendReportActivity extends AppCompatActivity {
     BarChart chart;
     TextView txtSaving;
     LinearLayout layoutBreakdown;
+    ImageButton btnBack;
 
     SimpleDateFormat dbFormat =
             new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -35,6 +39,9 @@ public class TrendReportActivity extends AppCompatActivity {
         chart = findViewById(R.id.chartIncome);
         txtSaving = findViewById(R.id.txtSaving);
         layoutBreakdown = findViewById(R.id.layoutBreakdown);
+        btnBack = findViewById(R.id.btnBack);
+
+        btnBack.setOnClickListener(v -> finish());
 
         loadChart();
         loadBreakdown();
@@ -47,12 +54,16 @@ public class TrendReportActivity extends AppCompatActivity {
             FintrackDatabase db =
                     FintrackDatabase.getInstance(getApplicationContext());
 
+            UserRepository userRepo = new UserRepository(this);
+            UserEntity user = userRepo.getCurrentUser();
+
+            if(user == null) return;
+
             List<TransactionEntity> list =
-                    db.transactionDao().getAll();
+                    db.transactionDao().getAllByUser(user.user_id);
 
             List<BarEntry> incomeEntries = new ArrayList<>();
             List<BarEntry> expenseEntries = new ArrayList<>();
-
             List<String> labels = new ArrayList<>();
 
             double totalIncome = 0;
@@ -73,7 +84,7 @@ public class TrendReportActivity extends AppCompatActivity {
 
                 for(TransactionEntity t : list){
 
-                    try {
+                    try{
 
                         Date date = dbFormat.parse(t.tx_date);
 
@@ -85,7 +96,8 @@ public class TrendReportActivity extends AppCompatActivity {
 
                             if("INCOME".equals(t.tx_type_id)){
                                 income += t.amount;
-                            }else{
+                            }
+                            else{
                                 expense += t.amount;
                             }
                         }
@@ -98,7 +110,7 @@ public class TrendReportActivity extends AppCompatActivity {
                 totalIncome += income;
                 totalExpense += expense;
 
-                int x = 5-i;
+                int x = 5 - i;
 
                 incomeEntries.add(new BarEntry(x,(float)income));
                 expenseEntries.add(new BarEntry(x,(float)expense));
@@ -119,29 +131,42 @@ public class TrendReportActivity extends AppCompatActivity {
 
                 BarDataSet incomeSet =
                         new BarDataSet(incomeEntries,"Income");
-
                 incomeSet.setColor(0xFF2ECC71);
 
                 BarDataSet expenseSet =
                         new BarDataSet(expenseEntries,"Expense");
-
                 expenseSet.setColor(0xFFE74C3C);
 
-                BarData data =
-                        new BarData(incomeSet,expenseSet);
+                BarData data = new BarData(incomeSet,expenseSet);
 
-                data.setBarWidth(0.3f);
+                float groupSpace = 0.2f;
+                float barSpace = 0.02f;
+                float barWidth = 0.38f;
+
+                data.setBarWidth(barWidth);
 
                 chart.setData(data);
+
+                chart.getXAxis().setAxisMinimum(0);
+                chart.getXAxis().setAxisMaximum(
+                        0 + data.getGroupWidth(groupSpace, barSpace) * labels.size()
+                );
+
+                chart.groupBars(0f,groupSpace,barSpace);
 
                 XAxis xAxis = chart.getXAxis();
                 xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
                 xAxis.setGranularity(1f);
+                xAxis.setCenterAxisLabels(true);
                 xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setDrawGridLines(false);
 
+                chart.getAxisRight().setEnabled(false);
                 chart.getDescription().setEnabled(false);
-                chart.animateY(1000);
 
+                chart.setFitBars(true);
+
+                chart.animateY(1000);
                 chart.invalidate();
             });
 
@@ -155,8 +180,13 @@ public class TrendReportActivity extends AppCompatActivity {
             FintrackDatabase db =
                     FintrackDatabase.getInstance(getApplicationContext());
 
+            UserRepository userRepo = new UserRepository(this);
+            UserEntity user = userRepo.getCurrentUser();
+
+            if(user == null) return;
+
             List<TransactionEntity> list =
-                    db.transactionDao().getAll();
+                    db.transactionDao().getAllByUser(user.user_id);
 
             Map<String,double[]> map =
                     new LinkedHashMap<>();
@@ -176,7 +206,7 @@ public class TrendReportActivity extends AppCompatActivity {
 
                 for(TransactionEntity t : list){
 
-                    try {
+                    try{
 
                         Date date = dbFormat.parse(t.tx_date);
 
@@ -188,7 +218,8 @@ public class TrendReportActivity extends AppCompatActivity {
 
                             if("INCOME".equals(t.tx_type_id)){
                                 income += t.amount;
-                            }else{
+                            }
+                            else{
                                 expense += t.amount;
                             }
                         }
@@ -217,10 +248,11 @@ public class TrendReportActivity extends AppCompatActivity {
                     TextView tv = new TextView(this);
 
                     tv.setText(
-                            m + "    Income: "
-                                    + NumberFormat.getInstance().format(income)
-                                    + "    Expense: "
-                                    + NumberFormat.getInstance().format(expense)
+                            m +
+                                    "    Income: " +
+                                    NumberFormat.getInstance().format(income) +
+                                    "    Expense: " +
+                                    NumberFormat.getInstance().format(expense)
                     );
 
                     tv.setPadding(12,12,12,12);

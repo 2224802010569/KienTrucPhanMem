@@ -13,14 +13,17 @@ import com.example.fintrack.TransactionService.data.db.FintrackDatabase;
 import com.example.fintrack.TransactionService.domain.usecase.TransferMoneyUseCase;
 import com.example.fintrack.AccountService.api.AccountApiImpl;
 import com.example.fintrack.AccountService.model.AccountEntity;
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import android.widget.ImageButton;
 
 public class TransferActivity extends AppCompatActivity {
-
+    private ImageButton btnBackTransfer;
     private final DecimalFormat df = new DecimalFormat("#,###");
-
+    private String currentUserId;
     private TextView tvSourceAccount, tvSourceBalance;
     private TextView tvTargetAccount, tvTargetBalance;
 
@@ -35,6 +38,7 @@ public class TransferActivity extends AppCompatActivity {
     private List<AccountEntity> accounts;
 
     private AccountApiImpl accountApi;
+    private UserRepository userRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +46,25 @@ public class TransferActivity extends AppCompatActivity {
         setContentView(R.layout.activity_transfer);
 
         accountApi = new AccountApiImpl(getApplicationContext());
+        userRepo = new UserRepository(this);
 
         initViews();
+        btnBackTransfer.setOnClickListener(v -> finish());
+
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        currentUserId = currentUser.user_id;
+
         loadAccounts();
         setupPresetButtons();
         setupTransfer();
+
+        if (currentUser != null) {
+            currentUserId = currentUser.user_id;
+        }
     }
 
     @Override
@@ -56,39 +74,34 @@ public class TransferActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-
         tvSourceAccount = findViewById(R.id.tvSourceAccount);
         tvSourceBalance = findViewById(R.id.tvSourceBalance);
-
         tvTargetAccount = findViewById(R.id.tvTargetAccount);
         tvTargetBalance = findViewById(R.id.tvTargetBalance);
-
         btnChangeSource = findViewById(R.id.btnChangeSource);
         btnChangeTarget = findViewById(R.id.btnChangeTarget);
-
         btnTransfer = findViewById(R.id.btnTransfer);
         btn500k = findViewById(R.id.btn500k);
         btn1m = findViewById(R.id.btn1m);
         btn5m = findViewById(R.id.btn5m);
-
         edtAmount = findViewById(R.id.edtAmount);
         edtNote = findViewById(R.id.edtNote);
+        btnBackTransfer = findViewById(R.id.btnBackTransfer);
     }
 
     private void loadAccounts() {
-
         new Thread(() -> {
+            UserEntity currentUser = userRepo.getCurrentUser();
+            if (currentUser == null) return;
 
-            List<AccountEntity> result =
-                    accountApi.getAccountsByUser("u001");
+            List<AccountEntity> result = accountApi.getAccountsByUser(currentUser.user_id);
 
             runOnUiThread(() -> {
-
                 accounts = result;
 
                 if (accounts == null || accounts.size() < 2) {
                     Toast.makeText(this,
-                            "Database chưa có 2 ví",
+                            "Bạn cần ít nhất 2 ví để thực hiện chuyển khoản",
                             Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -97,16 +110,16 @@ public class TransferActivity extends AppCompatActivity {
                 AccountEntity target = null;
 
                 for (AccountEntity acc : accounts) {
-
                     if (acc.accountId.equals(selectedSourceId))
                         source = acc;
-
                     if (acc.accountId.equals(selectedTargetId))
                         target = acc;
                 }
 
                 if (source == null) source = accounts.get(0);
-                if (target == null) target = accounts.get(1);
+                if (target == null) {
+                    target = (accounts.size() > 1) ? accounts.get(1) : accounts.get(0);
+                }
 
                 selectedSourceId = source.accountId;
                 selectedTargetId = target.accountId;
@@ -119,24 +132,18 @@ public class TransferActivity extends AppCompatActivity {
 
                 setupWalletSelectors();
             });
-
         }).start();
     }
 
     private void setupWalletSelectors() {
-
         btnChangeSource.setOnClickListener(v ->
                 AccountSelectDialog.show(
                         this,
                         accounts,
                         account -> {
-
                             selectedSourceId = account.accountId;
-
                             tvSourceAccount.setText(account.name);
-                            tvSourceBalance.setText(
-                                    "Balance: " + df.format(account.balance) + " VND"
-                            );
+                            tvSourceBalance.setText("Balance: " + df.format(account.balance) + " VND");
                         }
                 )
         );
@@ -146,54 +153,35 @@ public class TransferActivity extends AppCompatActivity {
                         this,
                         accounts,
                         account -> {
-
                             selectedTargetId = account.accountId;
-
                             tvTargetAccount.setText(account.name);
-                            tvTargetBalance.setText(
-                                    "Balance: " + df.format(account.balance) + " VND"
-                            );
+                            tvTargetBalance.setText("Balance: " + df.format(account.balance) + " VND");
                         }
                 )
         );
     }
 
     private void setupPresetButtons() {
-
         btn500k.setOnClickListener(v -> addAmount(500_000));
         btn1m.setOnClickListener(v -> addAmount(1_000_000));
         btn5m.setOnClickListener(v -> addAmount(5_000_000));
     }
 
     private void setupTransfer() {
-
         btnTransfer.setOnClickListener(v -> {
-
             if (selectedSourceId == null || selectedTargetId == null) {
-
-                Toast.makeText(this,
-                        "Vui lòng chọn ví",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Vui lòng chọn ví", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (selectedSourceId.equals(selectedTargetId)) {
-
-                Toast.makeText(this,
-                        "Source và Target không được trùng",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Ví gửi và ví nhận không được trùng nhau", Toast.LENGTH_LONG).show();
                 return;
             }
 
-            String amountStr = edtAmount.getText()
-                    .toString()
-                    .replaceAll("[^0-9]", "");
-
+            String amountStr = edtAmount.getText().toString().replaceAll("[^0-9]", "");
             if (amountStr.isEmpty()) {
-
-                Toast.makeText(this,
-                        "Vui lòng nhập số tiền",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Vui lòng nhập số tiền", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -205,22 +193,17 @@ public class TransferActivity extends AppCompatActivity {
     }
 
     private void executeTransfer(double amount, String note) {
-
         new Thread(() -> {
-
             try {
+                UserEntity currentUser = userRepo.getCurrentUser();
+                if (currentUser == null) return;
 
-                FintrackDatabase db =
-                        FintrackDatabase.getInstance(getApplicationContext());
-
-                TransferMoneyUseCase useCase =
-                        new TransferMoneyUseCase(
-                                db.transactionDao(),
-                                accountApi
-                        );
+                FintrackDatabase db = FintrackDatabase.getInstance(getApplicationContext());
+                TransferMoneyUseCase useCase = new TransferMoneyUseCase(db.transactionDao(), accountApi);
 
                 useCase.execute(
-                        "u001",
+
+                        currentUser.user_id,
                         selectedSourceId,
                         selectedTargetId,
                         amount,
@@ -228,34 +211,20 @@ public class TransferActivity extends AppCompatActivity {
                 );
 
                 runOnUiThread(() -> {
-
-                    Toast.makeText(this,
-                            "Chuyển tiền thành công",
-                            Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(this, "Chuyển tiền thành công", Toast.LENGTH_SHORT).show();
                     loadAccounts();
                 });
 
             } catch (Exception e) {
-
-                runOnUiThread(() ->
-                        Toast.makeText(this,
-                                e.getMessage(),
-                                Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show());
             }
-
         }).start();
     }
 
     private void addAmount(int add) {
-
-        String cur = edtAmount.getText()
-                .toString()
-                .replaceAll("[^0-9]", "");
-
+        String cur = edtAmount.getText().toString().replaceAll("[^0-9]", "");
         long val = cur.isEmpty() ? 0 : Long.parseLong(cur);
         val += add;
-
         edtAmount.setText(String.valueOf(val));
     }
 }

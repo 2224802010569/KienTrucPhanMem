@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import android.net.Uri;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.fintrack.R;
 import com.example.fintrack.UserService.data.UserRepository;
 import com.example.fintrack.UserService.data.entity.UserEntity;
+import com.example.fintrack.AlertService.view.BudgetActivity;
+import com.example.fintrack.TransactionService.view.AddTransactionActivity;
+import com.example.fintrack.TransactionService.view.CategoryManagementActivity;
 
 public class UserAccountProfileActivity extends AppCompatActivity {
 
@@ -22,9 +24,12 @@ public class UserAccountProfileActivity extends AppCompatActivity {
     TextView txtName, txtEmail, txtStatus;
     Button btnLogout;
 
-
     LinearLayout itemPersonalInfo, itemSecurity, itemLanguage;
     LinearLayout itemNotification, itemDefaultCurrency, itemHelp;
+
+    // ⭐ 2 BUTTON MỚI
+    LinearLayout itemAddTransaction;
+    LinearLayout itemCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +47,7 @@ public class UserAccountProfileActivity extends AppCompatActivity {
 
         btnLogout = findViewById(R.id.btnLogout);
 
-        imgAvatar = findViewById(R.id.imgAvatar); //
+        imgAvatar = findViewById(R.id.imgAvatar);
 
         itemPersonalInfo = findViewById(R.id.itemPersonalInfo);
         itemSecurity = findViewById(R.id.itemSecurity);
@@ -50,6 +55,10 @@ public class UserAccountProfileActivity extends AppCompatActivity {
         itemNotification = findViewById(R.id.itemNotification);
         itemDefaultCurrency = findViewById(R.id.itemDefaultCurrency);
         itemHelp = findViewById(R.id.itemHelp);
+
+        // ⭐ INIT 2 NÚT
+        itemAddTransaction = findViewById(R.id.itemAddTransaction);
+        itemCategory = findViewById(R.id.itemCategory);
 
         // ===== LOAD USER =====
         loadUser();
@@ -63,7 +72,11 @@ public class UserAccountProfileActivity extends AppCompatActivity {
 
         itemPersonalInfo.setOnClickListener(v -> {
 
-            Intent intent = new Intent(UserAccountProfileActivity.this, PersonalInfoActivity.class);
+            Intent intent = new Intent(
+                    UserAccountProfileActivity.this,
+                    PersonalInfoActivity.class
+            );
+
             startActivity(intent);
 
         });
@@ -76,9 +89,17 @@ public class UserAccountProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Language feature removed", Toast.LENGTH_SHORT).show()
         );
 
-        itemNotification.setOnClickListener(v ->
-                Toast.makeText(this, "Notifications", Toast.LENGTH_SHORT).show()
-        );
+        // ⭐ MỞ BUDGET
+        itemNotification.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    UserAccountProfileActivity.this,
+                    BudgetActivity.class
+            );
+
+            startActivity(intent);
+
+        });
 
         itemDefaultCurrency.setOnClickListener(v ->
                 Toast.makeText(this, "Default Currency: VND", Toast.LENGTH_SHORT).show()
@@ -87,6 +108,30 @@ public class UserAccountProfileActivity extends AppCompatActivity {
         itemHelp.setOnClickListener(v ->
                 Toast.makeText(this, "Help Center", Toast.LENGTH_SHORT).show()
         );
+
+        // ⭐ MỞ ADD TRANSACTION
+        itemAddTransaction.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    UserAccountProfileActivity.this,
+                    AddTransactionActivity.class
+            );
+
+            startActivity(intent);
+
+        });
+
+        // ⭐ MỞ CATEGORY MANAGEMENT
+        itemCategory.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    UserAccountProfileActivity.this,
+                    CategoryManagementActivity.class
+            );
+
+            startActivity(intent);
+
+        });
 
         btnLogout.setOnClickListener(v -> logout());
     }

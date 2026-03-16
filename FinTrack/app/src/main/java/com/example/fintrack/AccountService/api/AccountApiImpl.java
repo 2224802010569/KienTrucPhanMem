@@ -13,7 +13,7 @@ import java.util.List;
 
 public class AccountApiImpl implements AccountPort {
 
-    private final DeleteAccountUseCase deleteUC = new DeleteAccountUseCase();
+    private final DeleteAccountUseCase deleteUC; // Đã sửa: Khai báo ở đây
     private final UpdateBalanceUseCase updateBalanceUC;
     private final GetAccountBalanceUseCase getBalanceUC;
 
@@ -23,6 +23,8 @@ public class AccountApiImpl implements AccountPort {
 
         this.context = context.getApplicationContext();
 
+        // Đã sửa: Khởi tạo và truyền Context vào đây
+        deleteUC = new DeleteAccountUseCase(this.context);
         updateBalanceUC = new UpdateBalanceUseCase(this.context);
         getBalanceUC = new GetAccountBalanceUseCase(this.context);
     }

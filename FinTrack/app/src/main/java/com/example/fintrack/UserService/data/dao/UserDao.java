@@ -31,5 +31,7 @@ public interface UserDao {
     @Query("UPDATE users SET full_name = :username, password = :password, avatar = :avatar WHERE user_id = :userId")
     void updateUser(String userId, String username, String password, String avatar);
 
-
+    // Cập nhật mật khẩu bằng email (Dùng cho Quên mật khẩu)
+    @Query("UPDATE users SET password = :newPassword WHERE email = :email")
+    void updatePasswordByEmail(String email, String newPassword);
 }

@@ -1,6 +1,5 @@
 package com.example.fintrack.AnalyticService.usecase;
 
-import com.example.fintrack.AnalyticService.data.AnalyticsRepository;
 import com.example.fintrack.AnalyticService.entity.AnalyticsData;
 import com.example.fintrack.AnalyticService.service.AnalyticsDomainService;
 
@@ -10,16 +9,17 @@ public class GetAnalyticsUseCase {
 
     private AnalyticsDomainService service;
 
-    // nhận repository từ ngoài
-    public GetAnalyticsUseCase(AnalyticsRepository repository) {
-        service = new AnalyticsDomainService(repository);
+    public GetAnalyticsUseCase(AnalyticsDomainService service){
+        this.service = service;
     }
 
-    public List<AnalyticsData> execute(){
-        return service.getAnalytics();
-    }
+    public List<AnalyticsData> execute(
+            String userId,
+            String type,
+            String time
+    ){
 
-    public String getInsight(List<AnalyticsData> list){
-        return service.generateInsight(list);
+        return service.getAnalytics(userId, type, time);
+
     }
 }

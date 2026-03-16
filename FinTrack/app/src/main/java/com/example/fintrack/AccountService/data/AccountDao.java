@@ -26,7 +26,6 @@ public interface AccountDao {
     @Query("SELECT * FROM accounts WHERE account_id = :accountId LIMIT 1")
     AccountEntity getById(String accountId);
 
-    // ⭐ THÊM METHOD NÀY
     @Query("UPDATE accounts SET balance = balance + :amount WHERE account_id = :accountId")
     void updateBalance(String accountId, double amount);
 
@@ -35,4 +34,9 @@ public interface AccountDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertType(AccountTypeEntity type);
+    @Query("DELETE FROM accounts WHERE account_id = :accountId")
+    void deleteAccount(String accountId);
+
+    @Query("DELETE FROM account_types WHERE type_id = :typeId")
+    void deleteAccountType(String typeId);
 }

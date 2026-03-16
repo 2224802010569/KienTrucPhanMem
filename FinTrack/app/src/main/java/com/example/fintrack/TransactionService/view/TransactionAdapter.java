@@ -97,11 +97,13 @@ public class TransactionAdapter
         );
 
         // ===== EDIT BUTTON =====
-        vh.btnEdit.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onEdit(tx);
-            }
-        });
+        if (listener == null) {
+            vh.btnEdit.setVisibility(View.GONE);
+        } else {
+            vh.btnEdit.setVisibility(View.VISIBLE);
+            vh.btnEdit.setOnClickListener(v -> listener.onEdit(tx));
+        }
+
     }
 
     @Override

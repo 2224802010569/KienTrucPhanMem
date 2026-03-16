@@ -24,9 +24,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.data.entity.UserEntity;
 public class ImportBankStatementActivity extends AppCompatActivity {
-
+    private String currentUserId;
     private static final int PICK_FILE_REQUEST = 1001;
 
     private Button btnSelectFile;
@@ -66,6 +67,12 @@ public class ImportBankStatementActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> {
             finish(); // quay lại màn hình trước
         });
+        UserRepository userRepo = new UserRepository(this);
+        UserEntity currentUser = userRepo.getCurrentUser();
+
+        if (currentUser == null) return;
+
+        currentUserId = currentUser.user_id;
 
         btnStartImport.setOnClickListener(v -> {
             if (selectedFileUri == null) {
@@ -258,7 +265,7 @@ public class ImportBankStatementActivity extends AppCompatActivity {
                             new TransactionEntity(date, "00:00", amount, note);
 
                     transaction.tx_id = UUID.randomUUID().toString();
-                    transaction.user_id = "u001";
+                    transaction.user_id = currentUserId;
 
                     if (amount > 0) {
                         transaction.tx_type_id = "INCOME";

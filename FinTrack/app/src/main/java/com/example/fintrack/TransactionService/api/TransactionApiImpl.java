@@ -80,4 +80,20 @@ public class TransactionApiImpl implements TransactionPort {
         Double value = transactionDao.getTotalExpenseByCategory(userId, categoryId, month);
         return value == null ? 0 : value;
     }
+    @Override
+    public void insertTransaction(TransactionEntity tx) {
+        transactionDao.insert(tx);
+    }
+
+    @Override
+    public void deleteTransaction(String txId) {
+        TransactionEntity tx = transactionDao.getById(txId);
+        if(tx != null){
+            transactionDao.delete(tx);
+        }
+    }
+    @Override
+    public List<TransactionEntity> getRecentByAccount(String accountId) {
+        return transactionDao.getRecentByAccount(accountId);
+    }
 }

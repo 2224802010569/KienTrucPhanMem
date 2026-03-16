@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fintrack.R;
 import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.api.ExternalAccountApi;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -47,13 +48,10 @@ public class SplashActivity extends AppCompatActivity {
         UserRepository repo = new UserRepository(this);
 
         if (repo.isLoggedIn()) {
-
-            startActivity(new Intent(this, UserAccountProfileActivity.class));
-
+            ExternalAccountApi accountApi = new ExternalAccountApi();
+            accountApi.navigateToDashboard(this);
         } else {
-
             startActivity(new Intent(this, LoginActivity.class));
-
         }
 
         finish();

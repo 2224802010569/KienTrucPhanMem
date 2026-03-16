@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fintrack.R;
 import com.example.fintrack.UserService.data.UserRepository;
+import com.example.fintrack.UserService.api.ExternalAccountApi;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -36,8 +37,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // ===== AUTO LOGIN =====
         if (prefs.getBoolean("isLoggedIn", false)) {
-
-            startActivity(new Intent(this, UserAccountProfileActivity.class));
+            // DÙNG EXTERNAL API ĐỂ CHUYỂN TRANG
+            ExternalAccountApi accountApi = new ExternalAccountApi();
+            accountApi.navigateToDashboard(this);
             finish();
             return;
         }
@@ -139,7 +141,6 @@ public class LoginActivity extends AppCompatActivity {
         boolean success = userRepository.login(username, password);
 
         if (success) {
-
             // reset attempts
             prefs.edit().putInt("attempt_" + username, 0).apply();
 
@@ -149,11 +150,11 @@ public class LoginActivity extends AppCompatActivity {
                     .putString("username", username)
                     .apply();
 
-            Toast.makeText(this,
-                    "Đăng nhập thành công",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 
-            startActivity(new Intent(this, UserAccountProfileActivity.class));
+            // DÙNG EXTERNAL API ĐỂ CHUYỂN TRANG
+            ExternalAccountApi accountApi = new ExternalAccountApi();
+            accountApi.navigateToDashboard(this);
             finish();
 
         } else {

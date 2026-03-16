@@ -10,15 +10,30 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- TITLE -->
+        <!-- HEADER -->
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Financial Trends"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="#222"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_media_previous"
+                android:background="@android:color/transparent"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Financial Trends"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#222"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
 
 
         <!-- CARD CHART -->
