@@ -78,7 +78,8 @@ public class CategoryPickerBottomSheet extends BottomSheetDialogFragment {
                                     dismiss();
                                 }
                             }
-                        }
+                        },
+                        false
                 );
 
         rv.setAdapter(adapter);

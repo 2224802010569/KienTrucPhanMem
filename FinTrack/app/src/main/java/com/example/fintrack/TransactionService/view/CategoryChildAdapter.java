@@ -20,10 +20,14 @@ public class CategoryChildAdapter
 
     private List<CategoryEntity> list;
     private final Listener listener;
+    private final boolean isManagement;
 
-    public CategoryChildAdapter(List<CategoryEntity> list, Listener listener) {
+    public CategoryChildAdapter(List<CategoryEntity> list,
+                                Listener listener,
+                                boolean isManagement) {
         this.list = list;
         this.listener = listener;
+        this.isManagement = isManagement;
     }
 
     public void update(List<CategoryEntity> newList) {
@@ -44,10 +48,18 @@ public class CategoryChildAdapter
         CategoryEntity c = list.get(pos);
 
         h.name.setText(c.name);
+        h.icon.setText(c.icon);
 
-        // ẨN Edit/Delete khi dùng trong Category Picker
-        h.btnEdit.setVisibility(View.GONE);
-        h.btnDelete.setVisibility(View.GONE);
+        if (isManagement) {
+            h.btnEdit.setVisibility(View.VISIBLE);
+            h.btnDelete.setVisibility(View.VISIBLE);
+
+            h.btnEdit.setOnClickListener(v -> listener.onEdit(c));
+            h.btnDelete.setOnClickListener(v -> listener.onDelete(c));
+        } else {
+            h.btnEdit.setVisibility(View.GONE);
+            h.btnDelete.setVisibility(View.GONE);
+        }
 
         h.itemView.setOnClickListener(v -> listener.onClick(c));
     }
@@ -56,11 +68,12 @@ public class CategoryChildAdapter
     public int getItemCount() { return list == null ? 0 : list.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
-        TextView name;
+        TextView name, icon;
         Button btnEdit, btnDelete;
         VH(View v) {
             super(v);
             name = v.findViewById(R.id.txtChildName);
+            icon = v.findViewById(R.id.txtIcon);
             btnEdit = v.findViewById(R.id.btnEdit);
             btnDelete = v.findViewById(R.id.btnDelete);
         }

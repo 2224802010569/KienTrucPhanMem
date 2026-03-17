@@ -89,9 +89,10 @@ public class CategoryManagementActivity extends AppCompatActivity {
 
                     @Override
                     public void onClick(CategoryEntity c) {
-                        // KHÔNG LÀM GÌ – CategoryManagement không dùng click chọn
+
                     }
-                }
+                },
+                true
         );
 
         rvChild.setAdapter(childAdapter);
