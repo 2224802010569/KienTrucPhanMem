@@ -58,7 +58,7 @@ public class ScanReceiptActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_receipt);
-
+// Khởi tạo OCR engine của Google ML Kit
         recognizer = TextRecognition.getClient(
                 TextRecognizerOptions.DEFAULT_OPTIONS
         );
@@ -110,7 +110,7 @@ public class ScanReceiptActivity extends AppCompatActivity {
 
     // ===========================
     private void startCamera() {
-
+// thành phần quản lý camera trong CameraX
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
                 ProcessCameraProvider.getInstance(this);
 
@@ -119,7 +119,7 @@ public class ScanReceiptActivity extends AppCompatActivity {
             try {
 
                 cameraProvider = cameraProviderFuture.get();
-
+// Hiển thị hình ảnh camera lên PreviewView
                 Preview preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
